@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_orange_dark"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <TextView
+        android:id="@+id/morada"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Morada"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/moradaT"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rua do Ordonho de Cima, nº 61"
+        android:textAlignment="center"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/localidade"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Localidade"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/lcoalidadeT"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="4575-036, Alpendurada e Matos"
+        android:textAlignment="center"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Email"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/emailT"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="sportcenter@gmail.com"
+        android:textAlignment="center"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/telefone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Telefone"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/telefoneT"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="255611611"
+        android:textAlignment="center"
+        android:textSize="14sp" />
+
+    <view
+        class="android.support.v4.widget.Space"
+        id="@+id/view2"
+        layout_width="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="20sp" />
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="pt.ipp.estg.sportcenter.MapsActivity" />
+</LinearLayout>
