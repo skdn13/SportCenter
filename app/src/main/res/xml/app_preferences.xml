@@ -1,34 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="Definições">
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="pref_notifications"
-            android:summary="@string/notification_weather"
-            android:title="Notificações" />
-        <EditTextPreference
-            android:key="pref_username"
-            android:summary="Escolha um username "
-            android:title="Username" />
         <SwitchPreference
             android:key="pref_notifications_enabled2"
             android:summary="@string/not_weather"
             android:title="Notificações" />
-        <ListPreference
-            android:dependency="pref_notifications"
-            android:key="pref_notifications_language"
-            android:title="Idioma das notificações"
-            android:dialogTitle="Escolha um idioma"
-            android:entries="@array/pref_languages"
-            android:entryValues="@array/pref_languages_values"
-            android:defaultValue="@string/pref_languages_default" />
-        <!--  <MultiSelectListPreference
-              android:dependency="pref_notifications"
-              android:key="pref_notifications_language"
-              android:title="Idioma das notificações"
-              android:dialogTitle="Escolha um idioma"
-              android:entries="@array/pref_languages"
-              android:entryValues="@array/pref_languages_values"
-              android:defaultValue="@string/pref_languages_default" />-->
+        <SwitchPreference
+            android:key="pref_location_enabled"
+            android:summary="Ativar os serviços de localização"
+            android:title="Localização" />
     </PreferenceCategory>
 </PreferenceScreen>

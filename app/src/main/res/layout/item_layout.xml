@@ -14,15 +14,21 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:contentDescription="Ligar"
+        android:contentDescription="@string/ligar"
         app:srcCompat="@drawable/ic_action2_name" />
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text=""
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/preco"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textSize="18sp" />
 
     <Button

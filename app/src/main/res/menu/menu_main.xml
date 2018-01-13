@@ -4,7 +4,7 @@
     <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_action_name4"
-        android:title="Settings"
+        android:title="@string/def"
         app:showAsAction="ifRoom">
     </item>
 </menu>

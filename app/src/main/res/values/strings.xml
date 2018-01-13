@@ -90,12 +90,22 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
-    <string name="cor">Cor</string>
+    <string name="preco">Preço</string>
+    <string name="todo">TODO</string>
+    <string name="im">…</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="def">Definições</string>
+    <string name="shopping_cart_example">Shopping Cart Example</string>
+    <string name="checkout">Checkout</string>
+    <string name="thank_you_for_purchasing_product">Thank you for purchasing product</string>
+    <string name="shop_ping_cart_content">Shop ping Cart Content</string>
+    <string name="payment">Payment</string>
+    <string name="ligar">Ligar</string>
+    <string name="adicionar_ao_carrinho">Adicionar ao Carrinho</string>
+    <string name="pre_o">Preço</string>
+    <string name="descri_o">Descrição</string>
     <string name="tamanho">Tamanho</string>
+    <string name="cor">Cor</string>
     <string name="composi_o">Composição</string>
     <string name="sexo">Sexo</string>
-    <string name="descri_o">Descrição</string>
-    <string name="todo">TODO</string>
-    <string name="im">...</string>
-    <string name="title_activity_maps">Map</string>
 </resources>

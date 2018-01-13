@@ -26,17 +26,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Preferences" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".Main2Activity" />
-        <activity android:name=".ProductActivity"></activity>
-        <activity android:name=".Colecao" />
-        <activity android:name=".Dashboard" />
-        <activity android:name=".ColecaoHomem" />
-        <activity android:name=".ColecaoMulher" />
-        <activity android:name=".ColecaoCrianca"></activity>
-        <activity android:name=".Encomenda" />
+        <activity android:name="catalogos.DetalhesProduto" />
+        <activity android:name="catalogos.ProductActivity" />
+        <activity android:name=".EcraCatalogos" />
+        <activity android:name=".EcraInicial" />
+        <activity android:name="catalogos.ColecaoHomem" />
+        <activity android:name="catalogos.ColecaoMulher" />
+        <activity android:name="catalogos.ColecaoCrianca" />
+        <activity android:name="encomendas.Encomenda" />
+        <activity android:name="encomendas.Screen1" />
+        <activity android:name="encomendas.Screen2" />
+        <activity android:name="encomendas.CarrinhoCompras">
+
+        </activity>
         <activity
-            android:name=".LoginActivity"
+            android:name="login.LoginActivity"
             android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,9 +48,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -61,7 +62,7 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps" />
     </application>
 
 </manifest>
