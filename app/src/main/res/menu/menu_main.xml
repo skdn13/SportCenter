@@ -2,9 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/badge"
+        android:title="@string/carrinho"
+        android:actionLayout="@layout/contadorcarrinho"
+        android:icon="@drawable/ic_action_cart"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_action_name4"
         android:title="@string/def"
-        app:showAsAction="ifRoom">
-    </item>
+        app:showAsAction="ifRoom"/>
 </menu>

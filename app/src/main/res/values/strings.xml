@@ -108,4 +108,7 @@
     <string name="cor">Cor</string>
     <string name="composi_o">Composição</string>
     <string name="sexo">Sexo</string>
+    <string name="_99">99</string>
+    <string name="carrinho">Carrinho</string>
+    <string name="carrinho_de_compras">Carrinho de Compras</string>
 </resources>

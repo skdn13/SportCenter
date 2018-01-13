@@ -1,27 +1,40 @@
 package catalogos;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import basesDeDados.BDItens;
 import basesDeDados.BDProduto;
 import basesDeDados.BDImagens;
+import encomendas.Item;
 import pt.ipp.estg.sportcenter.R;
 import pt.ipp.estg.sportcenter.Utility;
 import retrofit2.Call;
@@ -30,6 +43,7 @@ import retrofit2.Response;
 
 public class DetalhesProduto extends AppCompatActivity implements DataFetchListner {
     private TextView mTextView, t2, t3, t4, t5, t6;
+    private Button add;
     private List<Product> details;
     private String nomeProduto = "";
     private DataAdapter adapter2;
@@ -37,6 +51,7 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
     private RestManager mRestManager;
     private BDImagens mDatabase;
     private DataFetchListner lis;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +64,10 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         nomeProduto = getIntent().getStringExtra("text");
         this.details = new ArrayList<>();
         mRestManager = new RestManager();
-        mTextView = (TextView) findViewById(R.id.textView9);
+        mTextView = findViewById(R.id.textView9);
         mTextView.setText(nomeProduto);
         reloadProductDetails((ArrayList<Product>) details);
-        t2 = (TextView) findViewById(R.id.textView13);
+        t2 = findViewById(R.id.textView13);
         String text2 = "", text3 = "", text4 = "", text5 = "";
         Float text6 = null;
         for (Product d : details) {
@@ -73,7 +88,27 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         t5.setText(text5);
         t6 = (TextView) findViewById(R.id.textView19);
         t6.setText(String.valueOf(text6));
-
+        add = findViewById(R.id.button2);
+        final Float finalText = text6;
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                add.setText("Adicionado ao carrinho!");
+                preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                int counter = preferences.getInt("image_data", 0);
+                counter++;
+                SharedPreferences.Editor edit = preferences.edit();
+                edit.putInt("image_data", counter);
+                edit.commit();
+                Toast.makeText(getApplicationContext(), "Novo item no carrinho", Toast.LENGTH_SHORT).show();
+                invalidateOptionsMenu();
+                try {
+                    inserirItem(new Item(finalText, 0, nomeProduto));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         images = new ArrayList<>();
         images.add(new DataModel("RipCurl", new URLlist("https://photos6.spartoo.pt/photos/594/5946468/5946468_500_A.jpg")));
         images.add(new DataModel("Billa", new URLlist("https://static.lvengine.net/bazardesportivo/Imgs/produtos/product_35806/f2ls06bif7-21_.jpg")));
@@ -93,6 +128,47 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         } else {
             mDatabase.fetchData(lis);
         }
+    }
+
+    private void inserirItem(Item p) throws Exception {
+        BDItens dbHelper = new BDItens(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("id", p.getId());
+        values.put("preco", p.getPreco());
+        values.put("quantidade", p.getQuantidade());
+        values.put("nome", p.getNome());
+        long rowId = db.insert("tblItem", null, values);
+        db.close();
+        if (rowId < 0) {
+            throw new Exception("Não foi possível inserir o item na Base de Dados");
+        }
+    }
+
+    private Drawable buildCounterDrawable(int count, int backgroundImageId) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.contadorcarrinho, null);
+        view.setBackgroundResource(backgroundImageId);
+
+        if (count == 0) {
+            View counterTextPanel = view.findViewById(R.id.count);
+            counterTextPanel.setVisibility(View.GONE);
+        } else {
+            TextView textView = (TextView) view.findViewById(R.id.count);
+            textView.setText("" + count);
+        }
+
+        view.measure(
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+
+        view.setDrawingCacheEnabled(true);
+        view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
+        view.setDrawingCacheEnabled(false);
+
+        return new BitmapDrawable(getResources(), bitmap);
     }
 
     public class SaveIntoDatabase extends AsyncTask<DataModel, Void, Void> {
@@ -201,7 +277,11 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        MenuItem menuItem = menu.findItem(R.id.badge);
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int counter = preferences.getInt("image_data", 0);
+        menuItem.setIcon(buildCounterDrawable(counter, R.drawable.ic_action_cart));
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -209,6 +289,9 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         switch (item.getItemId()) {
             case R.id.action_settings:
                 startActivity(new Intent(getApplicationContext(), pt.ipp.estg.sportcenter.Preferences.class));
+                return true;
+            case R.id.badge:
+                startActivity(new Intent(getApplicationContext(), encomendas.CarrinhoCompras.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

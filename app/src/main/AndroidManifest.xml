@@ -33,9 +33,6 @@
         <activity android:name="catalogos.ColecaoHomem" />
         <activity android:name="catalogos.ColecaoMulher" />
         <activity android:name="catalogos.ColecaoCrianca" />
-        <activity android:name="encomendas.Encomenda" />
-        <activity android:name="encomendas.Screen1" />
-        <activity android:name="encomendas.Screen2" />
         <activity android:name="encomendas.CarrinhoCompras">
 
         </activity>
