@@ -1,15 +1,33 @@
 package encomendas;
 
+import android.content.ContentValues;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Random;
 
+import basesDeDados.BDEncomendas;
 import basesDeDados.BDItens;
 import basesDeDados.BDProduto;
 import catalogos.Product;
@@ -20,6 +38,7 @@ import pt.ipp.estg.sportcenter.R;
 public class CarrinhoCompras extends AppCompatActivity {
     private ArrayList<Item> itens;
     private ItemAdapter adapter;
+    private SharedPreferences preferences;
 
     /**
      * Called when the activity is first created.
@@ -37,10 +56,67 @@ public class CarrinhoCompras extends AppCompatActivity {
         rvProducts.addItemDecoration(itemDecoration);
         itens = new ArrayList<>();
         reloadItemList(itens);
+        TextView total = findViewById(R.id.textView20);
+        TextView carrinho = findViewById(R.id.carr);
+        float totalCarrinho = 0;
+        for (Item f : itens) {
+            totalCarrinho += f.getPreco();
+        }
+        total.append(": " + String.valueOf(totalCarrinho) + "€");
         adapter = new ItemAdapter(this, itens);
         adapter.notifyDataSetChanged();
         rvProducts.setAdapter(adapter);
         rvProducts.setLayoutManager(new LinearLayoutManager(this));
+        Button checkout = findViewById(R.id.checkout);
+        if (itens.isEmpty()) {
+            checkout.setVisibility(View.INVISIBLE);
+            total.setText("");
+            carrinho.setText("Carrinho vazio!");
+        }
+        checkout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BDItens dbHelper = new BDItens(getApplicationContext());
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                Gson gson = new Gson();
+                String inputString = gson.toJson(itens);
+                for (Item i : itens) {
+                    long rowId = db.delete("tblItem", "id=?", new String[]{Integer.toString(i.getId())});
+                }
+                itens.clear();
+                db.close();
+                int random = new Random().nextInt(10000);
+                preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                String email = preferences.getString("email", "");
+                try {
+                    inserirEncomenda(new Encomenda(random, email, inputString));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                int counter = preferences.getInt("image_data", 0);
+                counter = 0;
+                SharedPreferences.Editor edit = preferences.edit();
+                edit.putInt("image_data", counter);
+                edit.commit();
+                Intent myIntent = new Intent(getApplicationContext(), encomendas.Checkout.class);
+                myIntent.putExtra("numero", random);
+                startActivity(myIntent);
+            }
+        });
+    }
+
+    private void inserirEncomenda(Encomenda p) throws Exception {
+        BDEncomendas dbHelper = new BDEncomendas(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("numero", p.getNumero());
+        values.put("nome", p.getNome());
+        values.put("conteudo", p.getConteudo());
+        long rowId = db.insert("tblEncomenda", null, values);
+        db.close();
+        if (rowId < 0) {
+            throw new Exception("Não foi possível inserir o item na Base de Dados");
+        }
     }
 
     public void reloadItemList(ArrayList<Item> list) {
@@ -68,5 +144,22 @@ public class CarrinhoCompras extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                startActivity(new Intent(getApplicationContext(), pt.ipp.estg.sportcenter.Preferences.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

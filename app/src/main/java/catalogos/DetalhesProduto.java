@@ -89,24 +89,38 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         t6 = (TextView) findViewById(R.id.textView19);
         t6.setText(String.valueOf(text6));
         add = findViewById(R.id.button2);
-        final Float finalText = text6;
+        final Float precoProduto = text6;
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                add.setText("Adicionado ao carrinho!");
                 preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 int counter = preferences.getInt("image_data", 0);
-                counter++;
                 SharedPreferences.Editor edit = preferences.edit();
-                edit.putInt("image_data", counter);
-                edit.commit();
-                Toast.makeText(getApplicationContext(), "Novo item no carrinho", Toast.LENGTH_SHORT).show();
-                invalidateOptionsMenu();
+                ArrayList<Item> lista = new ArrayList<>();
+                reloadItemList(lista);
+                boolean existe = false;
+                for (Item i : lista) {
+                    if (i.getNome().equals(nomeProduto)) {
+                        existe = true;
+                    }
+                }
                 try {
-                    inserirItem(new Item(finalText, 0, nomeProduto));
+                    if (!existeTabela() && !existe) {
+                        inserirItem(new Item(counter, precoProduto, 1, nomeProduto));
+                        counter++;
+                        edit.putInt("image_data", counter);
+                        edit.commit();
+                        add.setText("Adicionado ao carrinho!");
+                        Toast.makeText(getApplicationContext(), "Novo item no carrinho", Toast.LENGTH_SHORT).show();
+                        invalidateOptionsMenu();
+                    } else {
+                        add.setText("Já existe no carrinho!");
+                        Toast.makeText(getApplicationContext(), "Item já foi adicionado", Toast.LENGTH_SHORT).show();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
             }
         });
         images = new ArrayList<>();
@@ -128,6 +142,38 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         } else {
             mDatabase.fetchData(lis);
         }
+    }
+
+    private boolean existeTabela() {
+        BDItens dbHelper = new BDItens(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        try {
+            db.execSQL("SELECT * FROM sqlite_master WHERE name ='tblItem' and type='table'");
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    public void reloadItemList(ArrayList<Item> list) {
+        BDItens
+                dbHelper = new BDItens(this);
+        SQLiteDatabase db =
+                dbHelper.getWritableDatabase();
+        list.clear();
+        Cursor c = db.rawQuery("SELECT	*	FROM	tblItem", null);
+        if (c != null && c.moveToFirst()) {
+            do {
+                Item p = new Item();
+                p.setId(c.getInt(0));
+                p.setPreco(c.getFloat(1));
+                p.setQuantidade(c.getInt(2));
+                p.setNome(c.getString(3));
+                list.add(p);
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
     }
 
     private void inserirItem(Item p) throws Exception {

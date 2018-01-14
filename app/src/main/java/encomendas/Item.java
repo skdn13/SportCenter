@@ -18,7 +18,8 @@ public class Item {
         this.nome = nome;
     }
 
-    public Item(float preco, int quantidade, String nome) {
+    public Item(int id, float preco, int quantidade, String nome) {
+        this.id = id;
         this.preco = preco;
         this.quantidade = quantidade;
         this.nome = nome;

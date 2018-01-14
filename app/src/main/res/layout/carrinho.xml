@@ -13,11 +13,19 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
-
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/carrinho_de_compras"
+        android:id="@+id/carr"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -58,4 +66,7 @@
         android:layout_gravity="end"
         android:background="@android:color/holo_orange_dark"
         android:text="@string/checkout" />
+        </LinearLayout>
+    </ScrollView>
+
 </LinearLayout>

@@ -6,22 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
 
 public class Sessao {
     // Shared Preferences
     SharedPreferences pref;
 
     // Editor for Shared preferences
-    Editor editor;
+    SharedPreferences.Editor editor;
 
     // Context
     Context _context;
-
-    // Shared pref mode
-    int PRIVATE_MODE = 0;
-
-    // Sharedpref file name
-    private static final String PREF_NAME = "AndroidHivePref";
 
     // All Shared Preferences Keys
     private static final String IS_LOGIN = "IsLoggedIn";
@@ -35,7 +30,7 @@ public class Sessao {
     // Constructor
     public Sessao(Context context) {
         this._context = context;
-        pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
+        pref = PreferenceManager.getDefaultSharedPreferences(_context);
         editor = pref.edit();
     }
 

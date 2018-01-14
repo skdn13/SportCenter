@@ -40,7 +40,7 @@
                     android:layout_height="64dp"
                     android:background="@drawable/shape"
                     android:padding="10dp"
-                    android:src="@drawable/ic_action_name" />
+                    android:src="@drawable/catalogo" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -84,7 +84,7 @@
                     android:layout_height="64dp"
                     android:background="@drawable/shape"
                     android:padding="10dp"
-                    android:src="@drawable/ic_action_name" />
+                    android:src="@drawable/encomendas" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -104,7 +104,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="Ver carrinho de compras"
+                    android:text="Ver compras efetuadas"
                     android:textColor="@android:color/darker_gray" />
 
             </LinearLayout>
@@ -137,13 +137,13 @@
                     android:layout_height="64dp"
                     android:background="@drawable/shape"
                     android:padding="10dp"
-                    android:src="@drawable/ic_action_name" />
+                    android:src="@drawable/promocoes" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="Dados Pessoais"
+                    android:text="Promoções"
                     android:textStyle="bold" />
 
                 <View
@@ -157,7 +157,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="Alterar os seus dados"
+                    android:text="Ver artigos com desconto"
                     android:textColor="@android:color/darker_gray" />
 
             </LinearLayout>
@@ -182,7 +182,7 @@
                     android:layout_height="64dp"
                     android:background="@drawable/shape"
                     android:padding="10dp"
-                    android:src="@drawable/ic_action_name" />
+                    android:src="@drawable/contact" />
 
                 <TextView
                     android:layout_width="wrap_content"
