@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import basesDeDados.BDProduto;
 import pt.ipp.estg.sportcenter.R;
 
-
-public class ColecaoMulher extends AppCompatActivity {
+public class Promocoes extends AppCompatActivity {
 
     private ArrayList<Product> products;
     private ProductsAdapter adapter;
@@ -51,14 +50,13 @@ public class ColecaoMulher extends AppCompatActivity {
         rvProducts.setLayoutManager(new LinearLayoutManager(this));
     }
 
-
     public void reloadProductList(ArrayList<Product> list) {
         BDProduto
                 dbHelper = new BDProduto(this);
         SQLiteDatabase db =
                 dbHelper.getWritableDatabase();
         list.clear();
-        Cursor c = db.rawQuery("SELECT	*	FROM	tblProduto WHERE sexo='Feminino'", null);
+        Cursor c = db.rawQuery("SELECT	*	FROM	tblProduto WHERE promocao='Sim'", null);
         if (c != null && c.moveToFirst()) {
             do {
                 Product p = new Product();
@@ -111,6 +109,7 @@ public class ColecaoMulher extends AppCompatActivity {
 
         return new BitmapDrawable(getResources(), bitmap);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -135,3 +134,4 @@ public class ColecaoMulher extends AppCompatActivity {
         }
     }
 }
+

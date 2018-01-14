@@ -19,7 +19,7 @@ public class BDEncomendas extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE tblEncomenda (numero INTEGER PRIMARY KEY NOT NULL , nome VARCHAR(100) NOT NULL, conteudo VARCHAR(1000) NOT NULL)");
+        db.execSQL("CREATE TABLE tblEncomenda (numero INTEGER PRIMARY KEY NOT NULL , nome VARCHAR(100) NOT NULL, conteudo VARCHAR(1000) NOT NULL, total FLOAT NOT NULL)");
     }
 
     @Override

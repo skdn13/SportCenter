@@ -68,8 +68,8 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         mTextView.setText(nomeProduto);
         reloadProductDetails((ArrayList<Product>) details);
         t2 = findViewById(R.id.textView13);
-        String text2 = "", text3 = "", text4 = "", text5 = "";
-        Float text6 = null;
+        String text2 = "", text3 = "", text4 = "", text5 = "", promocao = "";
+        Float text6 = null, precoPromocao = null;
         for (Product d : details) {
             if (d.getNome().equals(nomeProduto)) {
                 text2 = d.getCor();
@@ -77,6 +77,8 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
                 text4 = d.getComposicao();
                 text5 = d.getSexo();
                 text6 = d.getPreco();
+                promocao = d.getPromocao();
+                precoPromocao = d.getPrecoPromocao();
             }
         }
         t2.setText(text2);
@@ -87,7 +89,11 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         t5 = (TextView) findViewById(R.id.textView17);
         t5.setText(text5);
         t6 = (TextView) findViewById(R.id.textView19);
-        t6.setText(String.valueOf(text6));
+        if (promocao.equals("Sim")) {
+            t6.setText(String.valueOf(precoPromocao) + "€");
+        } else {
+            t6.setText(String.valueOf(text6) + "€");
+        }
         add = findViewById(R.id.button2);
         final Float precoProduto = text6;
         add.setOnClickListener(new View.OnClickListener() {
@@ -307,6 +313,8 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
                 p.setComposicao(c.getString(6));
                 p.setImagem(c.getString(7));
                 p.setDisponivel(c.getString(8));
+                p.setPromocao(c.getString(9));
+                p.setPrecoPromocao(c.getFloat(10));
                 list.add(p);
             } while (c.moveToNext());
         }

@@ -10,11 +10,21 @@ public class Encomenda {
     private int numero;
     private String nome;
     private String conteudo;
+    private float total;
 
-    public Encomenda(int numero, String nome, String conteudo) {
+    public float getTotal() {
+        return total;
+    }
+
+    public void setTotal(float total) {
+        this.total = total;
+    }
+
+    public Encomenda(int numero, String nome, String conteudo, float total) {
         this.numero = numero;
         this.nome = nome;
         this.conteudo = conteudo;
+        this.total = total;
     }
 
     public Encomenda() {

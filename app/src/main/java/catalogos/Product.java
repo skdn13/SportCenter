@@ -10,6 +10,28 @@ public class Product {
     private String sexo;
     private String disponivel;
     private float preco;
+    private String promocao;
+    private float precoPromocao;
+
+    public String getDisponivel() {
+        return disponivel;
+    }
+
+    public String getPromocao() {
+        return promocao;
+    }
+
+    public void setPromocao(String promocao) {
+        this.promocao = promocao;
+    }
+
+    public float getPrecoPromocao() {
+        return precoPromocao;
+    }
+
+    public void setPrecoPromocao(float precoPromocao) {
+        this.precoPromocao = precoPromocao;
+    }
 
     public float getPreco() {
         return preco;
@@ -23,7 +45,9 @@ public class Product {
 
     }
 
-    public Product(float preco, String nome, String sexo, Integer referencia, String tamanho, String cor, String imagem, String composicao, String disponivel) {
+    public Product(String emPromocao, float precoPromocao, float preco, String nome, String sexo, Integer referencia, String tamanho, String cor, String imagem, String composicao, String disponivel) {
+        this.promocao = emPromocao;
+        this.precoPromocao = precoPromocao;
         this.nome = nome;
         this.referencia = referencia;
         this.tamanho = tamanho;

@@ -382,11 +382,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 exc.printStackTrace();
             }
 
+            sessao.createLoginSession(mEmail, mEmail);
             Cursor c = this.pesquisarEmail();
             if (c.getCount() > 0) {
                 c = this.pesquisarCombinacao(hash);
                 if (c.getCount() > 0) {
-                    sessao.createLoginSession(mEmail, mEmail);
                     startActivity(new Intent(getApplicationContext(), EcraInicial.class));
                     return true;
                 } else {

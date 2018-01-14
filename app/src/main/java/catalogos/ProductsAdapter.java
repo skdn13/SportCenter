@@ -42,8 +42,11 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         Product product = this.mProducts.get(position);
         TextView textView = viewHolder.nameTextView, precoView = viewHolder.preco;
         textView.setText(product.getNome());
-        precoView.setText(String.valueOf(product.getPreco()));
-
+        if (product.getPromocao().equals("Sim")) {
+            precoView.setText("Antigo: " + String.valueOf(product.getPreco()) + "€, Novo: " + String.valueOf(product.getPrecoPromocao()) + "€");
+        } else {
+            precoView.setText("Preço: " + String.valueOf(product.getPreco()) + "€");
+        }
         Button button = viewHolder.messageButton;
         final TextView textView1 = viewHolder.nameTextView;
         button.setText(product.isDisponivel().equals("Sim") ? "Detalhes" : "Indisponível");
@@ -76,10 +79,10 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
 
         public ViewHolder(View itemView) {
             super(itemView);
-            nameTextView =  itemView.findViewById(R.id.textView);
-            messageButton =  itemView.findViewById(R.id.button);
+            nameTextView = itemView.findViewById(R.id.textView);
+            messageButton = itemView.findViewById(R.id.button);
             imageView = itemView.findViewById(R.id.imageView);
-            preco =  itemView.findViewById(R.id.preco);
+            preco = itemView.findViewById(R.id.preco);
         }
     }
 }

@@ -71,6 +71,8 @@ public class ProductActivity extends AppCompatActivity {
                 p.setComposicao(c.getString(6));
                 p.setImagem(c.getString(7));
                 p.setDisponivel(c.getString(8));
+                p.setPromocao(c.getString(9));
+                p.setPrecoPromocao(c.getFloat(10));
                 list.add(p);
             } while (c.moveToNext());
         }
