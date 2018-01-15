@@ -34,6 +34,9 @@ import java.util.List;
 import basesDeDados.BDItens;
 import basesDeDados.BDProduto;
 import basesDeDados.BDImagens;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import encomendas.Item;
 import pt.ipp.estg.sportcenter.R;
 import pt.ipp.estg.sportcenter.Utility;
@@ -42,8 +45,20 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class DetalhesProduto extends AppCompatActivity implements DataFetchListner {
-    private TextView mTextView, t2, t3, t4, t5, t6;
-    private Button add;
+    @BindView(R.id.textView9)
+    TextView nome;
+    @BindView(R.id.textView13)
+    TextView cor;
+    @BindView(R.id.textView11)
+    TextView tamanho;
+    @BindView(R.id.textView15)
+    TextView composicao;
+    @BindView(R.id.textView17)
+    TextView sexo;
+    @BindView(R.id.textView19)
+    TextView preco;
+    private String text2 = "", text3 = "", text4 = "", text5 = "", promocao = "";
+    private Float text6 = null, precoPromocao = null;
     private List<Product> details;
     private String nomeProduto = "";
     private DataAdapter adapter2;
@@ -57,6 +72,7 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+        ButterKnife.bind(this);
         android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("SportCenter");
         setSupportActionBar(myToolbar);
@@ -64,12 +80,8 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         nomeProduto = getIntent().getStringExtra("text");
         this.details = new ArrayList<>();
         mRestManager = new RestManager();
-        mTextView = findViewById(R.id.textView9);
-        mTextView.setText(nomeProduto);
+        nome.setText(nomeProduto);
         reloadProductDetails((ArrayList<Product>) details);
-        t2 = findViewById(R.id.textView13);
-        String text2 = "", text3 = "", text4 = "", text5 = "", promocao = "";
-        Float text6 = null, precoPromocao = null;
         for (Product d : details) {
             if (d.getNome().equals(nomeProduto)) {
                 text2 = d.getCor();
@@ -81,54 +93,15 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
                 precoPromocao = d.getPrecoPromocao();
             }
         }
-        t2.setText(text2);
-        t3 = (TextView) findViewById(R.id.textView11);
-        t3.setText(text3);
-        t4 = (TextView) findViewById(R.id.textView15);
-        t4.setText(text4);
-        t5 = (TextView) findViewById(R.id.textView17);
-        t5.setText(text5);
-        t6 = (TextView) findViewById(R.id.textView19);
+        cor.setText(text2);
+        tamanho.setText(text3);
+        composicao.setText(text4);
+        sexo.setText(text5);
         if (promocao.equals("Sim")) {
-            t6.setText(String.valueOf(precoPromocao) + "€");
+            preco.setText(String.valueOf(precoPromocao) + "€");
         } else {
-            t6.setText(String.valueOf(text6) + "€");
+            preco.setText(String.valueOf(text6) + "€");
         }
-        add = findViewById(R.id.button2);
-        final Float precoProduto = text6;
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                int counter = preferences.getInt("image_data", 0);
-                SharedPreferences.Editor edit = preferences.edit();
-                ArrayList<Item> lista = new ArrayList<>();
-                reloadItemList(lista);
-                boolean existe = false;
-                for (Item i : lista) {
-                    if (i.getNome().equals(nomeProduto)) {
-                        existe = true;
-                    }
-                }
-                try {
-                    if (!existeTabela() && !existe) {
-                        inserirItem(new Item(counter, precoProduto, 1, nomeProduto));
-                        counter++;
-                        edit.putInt("image_data", counter);
-                        edit.commit();
-                        add.setText("Adicionado ao carrinho!");
-                        Toast.makeText(getApplicationContext(), "Novo item no carrinho", Toast.LENGTH_SHORT).show();
-                        invalidateOptionsMenu();
-                    } else {
-                        add.setText("Já existe no carrinho!");
-                        Toast.makeText(getApplicationContext(), "Item já foi adicionado", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
         images = new ArrayList<>();
         images.add(new DataModel("RipCurl", new URLlist("https://photos6.spartoo.pt/photos/594/5946468/5946468_500_A.jpg")));
         images.add(new DataModel("Billa", new URLlist("https://static.lvengine.net/bazardesportivo/Imgs/produtos/product_35806/f2ls06bif7-21_.jpg")));
@@ -148,6 +121,39 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         } else {
             mDatabase.fetchData(lis);
         }
+    }
+
+    @OnClick(R.id.button2)
+    public void addicionar(TextView view) {
+        final Float precoProduto = text6;
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int counter = preferences.getInt("image_data", 0);
+        SharedPreferences.Editor edit = preferences.edit();
+        ArrayList<Item> lista = new ArrayList<>();
+        reloadItemList(lista);
+        boolean existe = false;
+        for (Item i : lista) {
+            if (i.getNome().equals(nomeProduto)) {
+                existe = true;
+            }
+        }
+        try {
+            if (!existeTabela() && !existe) {
+                inserirItem(new Item(counter, precoProduto, 1, nomeProduto));
+                counter++;
+                edit.putInt("image_data", counter);
+                edit.commit();
+                view.setText("Adicionado ao carrinho!");
+                Toast.makeText(getApplicationContext(), "Novo item no carrinho", Toast.LENGTH_SHORT).show();
+                invalidateOptionsMenu();
+            } else {
+                view.setText("Já existe no carrinho!");
+                Toast.makeText(getApplicationContext(), "Item já foi adicionado", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private boolean existeTabela() {
@@ -224,22 +230,18 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
     }
 
     public class SaveIntoDatabase extends AsyncTask<DataModel, Void, Void> {
-        // can use UI thread here
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
         }
 
-        // automatically done on worker thread (separate from UI thread)
         @Override
         protected Void doInBackground(DataModel... params) {
             DataModel dataModel = params[0];
             try {
                 InputStream inputStream = new URL(dataModel.getUrl().getMedium()).openStream();
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                //set bitmap value to Picture
                 dataModel.setPicture(bitmap);
-                //add data to database (shows in next step)
                 mDatabase.addData(dataModel);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -249,20 +251,12 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
     }
 
     private void loadData() {
-        // Prepare the HTTP request
         Call<List<DataModel>> listData = mRestManager.getFlowerService().getAllData();
-        // Asynchronously execute HTTP request
         listData.enqueue(new Callback<List<DataModel>>() {
-            /**
-             * onResponse is called when any kind of response has been received.
-             */
             @Override
             public void onResponse(Call<List<DataModel>> call, Response<List<DataModel>> response) {
-                // isSuccess is true if response code => 200 and <= 300
                 if (response.isSuccessful()) {
-                    // if parsing the JSON body failed,response.body() returns null
                     List<DataModel> datalist = response.body();
-                    //Traversing through the whole list to get all data to save database
                     for (int i = 0; i < datalist.size(); i++) {
                         DataModel data = datalist.get(i);
                         SaveIntoDatabase task = new SaveIntoDatabase();
@@ -271,11 +265,6 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
                     }
                 }
             }
-
-            /**
-             * onFailure gets called when the HTTP request didn't get through.
-             * For instance if the URL is invalid / host not reachable
-             */
             @Override
             public void onFailure(Call<List<DataModel>> call, Throwable t) {
             }

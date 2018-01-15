@@ -8,13 +8,10 @@ public class RestManager {
     private static final String BASE_URL = "http://api.androidhive.info";
     public DataService getFlowerService() {
         if(dataService == null){
-            //Retrofit setup
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
-
-            //Service setup
             dataService = retrofit.create(DataService.class);
         }
         return dataService;

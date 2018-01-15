@@ -41,12 +41,9 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         DataModel currFlower = this.mImages.get(position);
-//check data present in database
         if (currFlower.isFromDataBase()) {
             holder.imageView.setImageBitmap(currFlower.getPicture());
         } else {
-            //holder.title.setText(currFlower.getName());
-//set imageview using picasso
             Picasso.with(holder.itemView.getContext()).load(currFlower.getUrl().getMedium()).into(holder.imageView);
         }
     }

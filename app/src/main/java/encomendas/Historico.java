@@ -1,6 +1,5 @@
 package encomendas;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -17,29 +16,31 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
-import java.util.Random;
 
 import basesDeDados.BDEncomendas;
-import basesDeDados.BDItens;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import pt.ipp.estg.sportcenter.R;
 
 
 public class Historico extends AppCompatActivity {
+    @BindView(R.id.checkout)
+    Button checkout;
+    @BindView(R.id.textView20)
+    TextView total;
+    @BindView(R.id.carr)
+    TextView carrinho;
     private ArrayList<Encomenda> historico;
     private EncomendaAdapter adapter;
     private SharedPreferences preferences;
     private String email = "";
 
-    /**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.carrinho);
+        ButterKnife.bind(this);
         android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("SportCenter");
         setSupportActionBar(myToolbar);
@@ -51,13 +52,10 @@ public class Historico extends AppCompatActivity {
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         email = preferences.getString("email", "");
         reloadEncomendaList(historico);
-        TextView total = findViewById(R.id.textView20);
-        TextView carrinho = findViewById(R.id.carr);
         adapter = new EncomendaAdapter(this, historico);
         adapter.notifyDataSetChanged();
         rvProducts.setAdapter(adapter);
         rvProducts.setLayoutManager(new LinearLayoutManager(this));
-        Button checkout = findViewById(R.id.checkout);
         checkout.setVisibility(View.INVISIBLE);
         total.setText("");
         if (historico.isEmpty()) {
@@ -66,21 +64,6 @@ public class Historico extends AppCompatActivity {
             carrinho.setText("Compras efetuadas: ");
         }
 
-    }
-
-    private void inserirEncomenda(Encomenda p) throws Exception {
-        BDEncomendas dbHelper = new BDEncomendas(this);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("numero", p.getNumero());
-        values.put("nome", p.getNome());
-        values.put("conteudo", p.getConteudo());
-        values.put("total", p.getTotal());
-        long rowId = db.insert("tblEncomenda", null, values);
-        db.close();
-        if (rowId < 0) {
-            throw new Exception("Não foi possível inserir o item na Base de Dados");
-        }
     }
 
     public void reloadEncomendaList(ArrayList<Encomenda> list) {

@@ -1,6 +1,5 @@
 package pt.ipp.estg.sportcenter;
 
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -17,15 +16,12 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -37,13 +33,14 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import basesDeDados.BDProduto;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import catalogos.Product;
 import catalogos.Promocoes;
 import encomendas.Historico;
 
 
 public class EcraInicial extends AppCompatActivity {
-    private CardView catalogo, contacto, encomendas, promocoes;
     private static final int REQUEST_FINE_LOCATION = 100;
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest mLocationRequest;
@@ -54,69 +51,19 @@ public class EcraInicial extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard);
+        ButterKnife.bind(this);
         android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("SportCenter");
         setSupportActionBar(myToolbar);
-        catalogo = findViewById(R.id.a);
-        catalogo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), EcraCatalogos.class);
-                startActivity(intent);
-            }
-        });
-        contacto = findViewById(R.id.contacto);
-        contacto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                startActivity(intent);
-            }
-        });
-        encomendas = findViewById(R.id.historico);
-        encomendas.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), Historico.class);
-                startActivity(intent);
-            }
-        });
-        promocoes = findViewById(R.id.promocoes);
-        promocoes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), Promocoes.class);
-                startActivity(intent);
-            }
-        });
         try {
             if (!existeTabela()) {
-                inserirProduto(new Product("Sim", 5.95f, 10.95f, "Tshirt RipCurl", "Feminino", 1, "M", "Azul", "...", "100% Algodão", "Sim"));
-                inserirProduto(new Product("Não", 20.95f, 20.95f, "Camisola BillaBong", "Masculino", 2, "XL", "Preto", "...", "100% Algodão", "Sim"));
-                inserirProduto(new Product("Não", 5.95f, 5.95f, "Chinelos Roxy", "Feminino", 3, "36", "Rosa", "...", "100% Algodão", "Sim"));
-                inserirProduto(new Product("Não", 4.95f, 4.95f, "Chinelos QuickSilver", "Masculino", 4, "44", "Verde", "...", "100% Algodão", "Sim"));
-                inserirProduto(new Product("Não", 12.95f, 12.95f, "Calças Nike", "Crianca", 5, "16", "Amarelo", "...", "100% Algodão", "Sim"));
-                inserirProduto(new Product("Não", 34.95f, 34.95f, "Calções Adidas", "Masculino", 6, "XL", "Cinzento", "...", "100% Algodão", "Sim"));
-                inserirProduto(new Product("Não", 28.95f, 28.95f, "Sweat Asics", "Feminino", 7, "S", "Branco", "...", "100% Algodão", "Sim"));
-                inserirProduto(new Product("Sim", 12.95f, 24.95f, "Tshirt Puma", "Crianca", 8, "14", "Preto", "...", "100% Algodão", "Sim"));
-                inserirProduto(new Product("Sim", 60.95f, 80.0f, "Sapatilhas New Balance", "Masculino", 9, "42", "Laranja", "...", "100% Algodão", "Sim"));
-                inserirProduto(new Product("Sim", 8.95f, 10.0f, "Gorro Berg", "Feminino", 10, "L", "Verde", "...", "100% Algodão", "Sim"));
-                inserirProduto(new Product("Sim", 7.50f, 12.0f, "Cachecol Adidas", "Crianca", 11, "S", "Azul", "...", "100% Algodão", "Sim"));
+                this.insertAllProducts();
             }
         } catch (Exception e) {
             Log.w("drop", "contentCreated");
         }
-
-
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -126,13 +73,7 @@ public class EcraInicial extends AppCompatActivity {
                     Log.d("latitude", String.valueOf(location.getLatitude()));
                     Log.d("longitude", String.valueOf(location.getLongitude()));
                     if (location.getLatitude() == 41.088095 && location.getLongitude() == -8.2439617) {
-                        NotificationCompat.Builder notification = new NotificationCompat.Builder(getApplicationContext());
-                        notification.setContentTitle("SportCenter");
-                        notification.setContentText("Olá! Vemos que está próximo da nossa loja, visite-nos!");
-                        notification.setAutoCancel(true);
-                        notification.setSmallIcon(R.drawable.ic_stat_name);
-                        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                        manager.notify(1, notification.build());
+                        enviarNotificacao();
                     }
                 }
             }
@@ -157,19 +98,60 @@ public class EcraInicial extends AppCompatActivity {
         startLocationUpdates();
     }
 
+    private void enviarNotificacao() {
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(getApplicationContext());
+        notification.setContentTitle("SportCenter");
+        notification.setContentText("Olá! Vemos que está próximo da nossa loja, visite-nos!");
+        notification.setAutoCancel(true);
+        notification.setSmallIcon(R.drawable.ic_stat_name);
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(1, notification.build());
+    }
+
+    @OnClick(R.id.a)
+    public void Catalogos() {
+        Intent intent = new Intent(getApplicationContext(), EcraCatalogos.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.contacto)
+    public void Contacto() {
+        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.historico)
+    public void historico() {
+        Intent intent = new Intent(getApplicationContext(), Historico.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.promocoes)
+    public void promocoes() {
+        Intent intent = new Intent(getApplicationContext(), Promocoes.class);
+        startActivity(intent);
+    }
+
     private void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
+    private void insertAllProducts() throws Exception {
+        inserirProduto(new Product("Sim", 5.95f, 10.95f, "Tshirt RipCurl", "Feminino", 1, "M", "Azul", "...", "100% Algodão", "Sim"));
+        inserirProduto(new Product("Não", 20.95f, 20.95f, "Camisola BillaBong", "Masculino", 2, "XL", "Preto", "...", "100% Algodão", "Sim"));
+        inserirProduto(new Product("Não", 5.95f, 5.95f, "Chinelos Roxy", "Feminino", 3, "36", "Rosa", "...", "100% Algodão", "Sim"));
+        inserirProduto(new Product("Não", 4.95f, 4.95f, "Chinelos QuickSilver", "Masculino", 4, "44", "Verde", "...", "100% Algodão", "Sim"));
+        inserirProduto(new Product("Não", 12.95f, 12.95f, "Calças Nike", "Crianca", 5, "16", "Amarelo", "...", "100% Algodão", "Sim"));
+        inserirProduto(new Product("Não", 34.95f, 34.95f, "Calções Adidas", "Masculino", 6, "XL", "Cinzento", "...", "100% Algodão", "Sim"));
+        inserirProduto(new Product("Não", 28.95f, 28.95f, "Sweat Asics", "Feminino", 7, "S", "Branco", "...", "100% Algodão", "Sim"));
+        inserirProduto(new Product("Sim", 12.95f, 24.95f, "Tshirt Puma", "Crianca", 8, "14", "Preto", "...", "100% Algodão", "Sim"));
+        inserirProduto(new Product("Sim", 60.95f, 80.0f, "Sapatilhas New Balance", "Masculino", 9, "42", "Laranja", "...", "100% Algodão", "Sim"));
+        inserirProduto(new Product("Sim", 8.95f, 10.0f, "Gorro Berg", "Feminino", 10, "L", "Verde", "...", "100% Algodão", "Sim"));
+        inserirProduto(new Product("Sim", 7.50f, 12.0f, "Cachecol Adidas", "Crianca", 11, "S", "Azul", "...", "100% Algodão", "Sim"));
+    }
+
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);

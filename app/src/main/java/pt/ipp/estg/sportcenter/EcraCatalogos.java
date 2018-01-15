@@ -19,71 +19,53 @@ import android.view.View;
 import android.widget.TextView;
 
 import basesDeDados.BDProduto;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import catalogos.ColecaoCrianca;
 import catalogos.ColecaoHomem;
 import catalogos.ColecaoMulher;
 import catalogos.Product;
 import catalogos.ProductActivity;
+import catalogos.Promocoes;
+import encomendas.Historico;
 
 
 public class EcraCatalogos extends AppCompatActivity {
-    private CardView catalogo, colecaoHomem, colecaoMulher, colecaoCrianca;
     private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard_cat);
+        ButterKnife.bind(this);
         android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("SportCenter");
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        catalogo = findViewById(R.id.b);
-        catalogo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), ProductActivity.class);
-                startActivity(intent);
-            }
-        });
-        colecaoHomem = findViewById(R.id.c);
-        colecaoHomem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), ColecaoHomem.class);
-                startActivity(i);
-            }
-        });
-        colecaoMulher = findViewById(R.id.d);
-        colecaoMulher.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), ColecaoMulher.class);
-                startActivity(i);
-            }
-        });
-        colecaoCrianca = findViewById(R.id.crianca);
-        colecaoCrianca.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), ColecaoCrianca.class);
-                startActivity(i);
-            }
-        });
     }
 
-    private void apagarProduto(Product p) throws Exception {
-        BDProduto dbHelper = new BDProduto(this);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        long rowId = db.delete("tblProduto", p.getNome(), null);
-        db.close();
+    @OnClick(R.id.b)
+    public void todosArtigos() {
+        Intent intent = new Intent(getApplicationContext(), ProductActivity.class);
+        startActivity(intent);
     }
 
-    private void apagarTabelaProduto() throws Exception {
-        BDProduto dbHelper = new BDProduto(this);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete("tblProduto", null, null);
-        db.close();
+    @OnClick(R.id.c)
+    public void colecaoHomem() {
+        Intent i = new Intent(getApplicationContext(), ColecaoHomem.class);
+        startActivity(i);
+    }
+
+    @OnClick(R.id.d)
+    public void colecaoMulher() {
+        Intent i = new Intent(getApplicationContext(), ColecaoMulher.class);
+        startActivity(i);
+    }
+
+    @OnClick(R.id.crianca)
+    public void colecaoCrianca() {
+        Intent i = new Intent(getApplicationContext(), ColecaoCrianca.class);
+        startActivity(i);
     }
 
     @Override

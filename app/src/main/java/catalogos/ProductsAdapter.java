@@ -13,6 +13,10 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import butterknife.BindBitmap;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import pt.ipp.estg.sportcenter.R;
 
 
@@ -34,36 +38,26 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View contactView = inflater.inflate(R.layout.item_layout, parent, false);
+        ButterKnife.bind(this, contactView);
         return new ViewHolder(contactView);
     }
 
     @Override
     public void onBindViewHolder(ProductsAdapter.ViewHolder viewHolder, int position) {
         Product product = this.mProducts.get(position);
-        TextView textView = viewHolder.nameTextView, precoView = viewHolder.preco;
-        textView.setText(product.getNome());
+        viewHolder.nameTextView.setText(product.getNome());
         if (product.getPromocao().equals("Sim")) {
-            precoView.setText("Antigo: " + String.valueOf(product.getPreco()) + "€, Novo: " + String.valueOf(product.getPrecoPromocao()) + "€");
+            viewHolder.preco.setText("Antigo: " + String.valueOf(product.getPreco()) + "€, Novo: " + String.valueOf(product.getPrecoPromocao()) + "€");
         } else {
-            precoView.setText("Preço: " + String.valueOf(product.getPreco()) + "€");
+            viewHolder.preco.setText("Preço: " + String.valueOf(product.getPreco()) + "€");
         }
-        Button button = viewHolder.messageButton;
-        final TextView textView1 = viewHolder.nameTextView;
-        button.setText(product.isDisponivel().equals("Sim") ? "Detalhes" : "Indisponível");
-        button.setEnabled(product.isDisponivel().equals("Sim"));
+        viewHolder.button.setText(product.isDisponivel().equals("Sim") ? "Detalhes" : "Indisponível");
+        viewHolder.button.setEnabled(product.isDisponivel().equals("Sim"));
         if (product.isDisponivel().equals("Sim")) {
             viewHolder.imageView.setImageDrawable(ContextCompat.getDrawable(getmContext(), R.drawable.ic_action2_name));
         } else {
             viewHolder.imageView.setImageDrawable(ContextCompat.getDrawable(getmContext(), R.drawable.ic_action3_name));
         }
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent myIntent = new Intent(mContext, DetalhesProduto.class);
-                myIntent.putExtra("text", textView1.getText().toString());
-                mContext.startActivity(myIntent);
-            }
-        });
     }
 
     @Override
@@ -73,16 +67,25 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView nameTextView, preco;
-        public Button messageButton;
-        public ImageView imageView;
-
+        @BindView(R.id.textView)
+        TextView nameTextView;
+        @BindView(R.id.preco)
+        TextView preco;
+        @BindView(R.id.imageView)
+        ImageView imageView;
+        @BindView(R.id.button)
+        Button button;
+        @OnClick(R.id.button)
+        public void detalhes() {
+            Intent myIntent = new Intent(mContext, DetalhesProduto.class);
+            myIntent.putExtra("text", nameTextView.getText().toString());
+            mContext.startActivity(myIntent);
+        }
         public ViewHolder(View itemView) {
             super(itemView);
-            nameTextView = itemView.findViewById(R.id.textView);
-            messageButton = itemView.findViewById(R.id.button);
-            imageView = itemView.findViewById(R.id.imageView);
-            preco = itemView.findViewById(R.id.preco);
+            ButterKnife.bind(this, itemView);
         }
     }
+
+
 }

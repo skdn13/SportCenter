@@ -23,13 +23,13 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text=""
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/preco"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp" />
+        android:textSize="14sp" />
 
     <Button
         android:id="@+id/button"

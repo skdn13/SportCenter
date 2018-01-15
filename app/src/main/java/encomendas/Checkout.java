@@ -9,10 +9,9 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
-
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import pt.ipp.estg.sportcenter.R;
 
 
@@ -22,6 +21,7 @@ public class Checkout extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.checkout);
+        ButterKnife.bind(this);
         Intent mIntent = getIntent();
         int numero = mIntent.getIntExtra("numero", 0);
         TextView numeroText = findViewById(R.id.textView21);
@@ -30,7 +30,7 @@ public class Checkout extends AppCompatActivity {
         myToolbar.setTitle("SportCenter");
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Button inicio = findViewById(R.id.button3);
+
         NotificationCompat.Builder notification = new NotificationCompat.Builder(this);
         notification.setContentTitle("SportCenter");
         notification.setContentText("Encomenda efetuada: " + numero + ", Obrigado!");
@@ -45,12 +45,11 @@ public class Checkout extends AppCompatActivity {
                 manager.cancel(0);
             }
         }, delayInMilliseconds);
-        inicio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), pt.ipp.estg.sportcenter.EcraInicial.class));
-            }
-        });
+    }
+
+    @OnClick(R.id.button3)
+    public void inicio() {
+        startActivity(new Intent(getApplicationContext(), pt.ipp.estg.sportcenter.EcraInicial.class));
     }
 
     @Override

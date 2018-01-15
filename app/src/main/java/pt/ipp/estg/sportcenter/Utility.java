@@ -8,9 +8,6 @@ import android.net.NetworkInfo;
 
 import java.io.ByteArrayOutputStream;
 
-/**
- * Created by pmms8 on 1/7/2018.
- */
 
 public class Utility {
     public static byte[] getPictureByteOfArray(Bitmap bitmap) {

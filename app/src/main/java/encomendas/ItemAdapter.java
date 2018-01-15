@@ -1,7 +1,6 @@
 package encomendas;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
@@ -16,6 +15,9 @@ import android.widget.Toast;
 import java.util.List;
 
 import basesDeDados.BDItens;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import pt.ipp.estg.sportcenter.R;
 
 
@@ -23,6 +25,7 @@ public class ItemAdapter extends RecyclerView.Adapter<encomendas.ItemAdapter.Vie
     private Context mContext;
     private List<Item> mItens;
     private SharedPreferences preferences;
+    private Item product;
 
     public ItemAdapter(Context context, List<Item> itens) {
         this.mItens = itens;
@@ -38,36 +41,17 @@ public class ItemAdapter extends RecyclerView.Adapter<encomendas.ItemAdapter.Vie
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View contactView = inflater.inflate(R.layout.item_layout, parent, false);
+        ButterKnife.bind(this, contactView);
         return new encomendas.ItemAdapter.ViewHolder(contactView);
     }
 
 
     @Override
     public void onBindViewHolder(encomendas.ItemAdapter.ViewHolder viewHolder, final int position) {
-        final Item product = this.mItens.get(position);
-        TextView textView = viewHolder.nameTextView, precoView = viewHolder.preco;
-        textView.setText(product.getNome());
-        precoView.setText(String.valueOf(product.getPreco()));
-        final Button button = viewHolder.messageButton;
-        button.setText("Apagar");
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BDItens dbHelper = new BDItens(getmContext());
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                long rowId = db.delete("tblItem", "id=?", new String[]{Integer.toString(product.getId())});
-                db.close();
-                button.setText("Eliminado");
-                Toast.makeText(mContext, "Item eliminado do carrinho", Toast.LENGTH_SHORT).show();
-                preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-                int counter = preferences.getInt("image_data", 0);
-                counter--;
-                SharedPreferences.Editor edit = preferences.edit();
-                edit.putInt("image_data", counter);
-                edit.commit();
-                mItens.remove(product);
-            }
-        });
+        product = this.mItens.get(position);
+        viewHolder.nome.setText(product.getNome());
+        viewHolder.preco.setText(String.valueOf(product.getPreco()) + "€");
+        viewHolder.apagar.setText("Apagar");
     }
 
     @Override
@@ -76,15 +60,33 @@ public class ItemAdapter extends RecyclerView.Adapter<encomendas.ItemAdapter.Vie
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.textView)
+        TextView nome;
+        @BindView(R.id.preco)
+        TextView preco;
+        @BindView(R.id.button)
+        Button apagar;
 
-        public TextView nameTextView, preco;
-        public Button messageButton;
+        @OnClick(R.id.button)
+        public void apagar(Button button) {
+            BDItens dbHelper = new BDItens(getmContext());
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            long rowId = db.delete("tblItem", "id=?", new String[]{Integer.toString(product.getId())});
+            db.close();
+            button.setText("Eliminado");
+            Toast.makeText(mContext, "Item eliminado do carrinho", Toast.LENGTH_SHORT).show();
+            preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+            int counter = preferences.getInt("image_data", 0);
+            counter--;
+            SharedPreferences.Editor edit = preferences.edit();
+            edit.putInt("image_data", counter);
+            edit.commit();
+            mItens.remove(product);
+        }
 
         public ViewHolder(View itemView) {
             super(itemView);
-            nameTextView = itemView.findViewById(R.id.textView);
-            messageButton = itemView.findViewById(R.id.button);
-            preco = itemView.findViewById(R.id.preco);
+            ButterKnife.bind(this, itemView);
         }
     }
 }

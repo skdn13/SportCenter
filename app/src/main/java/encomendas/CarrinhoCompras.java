@@ -30,6 +30,9 @@ import java.util.Random;
 import basesDeDados.BDEncomendas;
 import basesDeDados.BDItens;
 import basesDeDados.BDProduto;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import catalogos.Product;
 import catalogos.ProductsAdapter;
 import pt.ipp.estg.sportcenter.R;
@@ -39,6 +42,9 @@ public class CarrinhoCompras extends AppCompatActivity {
     private ArrayList<Item> itens;
     private ItemAdapter adapter;
     private SharedPreferences preferences;
+    @BindView(R.id.checkout)
+    Button checkout;
+    private float totalCarrinho = 0;
 
     /**
      * Called when the activity is first created.
@@ -47,6 +53,7 @@ public class CarrinhoCompras extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.carrinho);
+        ButterKnife.bind(this);
         android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("SportCenter");
         setSupportActionBar(myToolbar);
@@ -58,7 +65,6 @@ public class CarrinhoCompras extends AppCompatActivity {
         reloadItemList(itens);
         TextView total = findViewById(R.id.textView20);
         TextView carrinho = findViewById(R.id.carr);
-        float totalCarrinho = 0;
         for (Item f : itens) {
             totalCarrinho += f.getPreco();
         }
@@ -67,43 +73,40 @@ public class CarrinhoCompras extends AppCompatActivity {
         adapter.notifyDataSetChanged();
         rvProducts.setAdapter(adapter);
         rvProducts.setLayoutManager(new LinearLayoutManager(this));
-        Button checkout = findViewById(R.id.checkout);
         if (itens.isEmpty()) {
             checkout.setVisibility(View.INVISIBLE);
             total.setText("");
             carrinho.setText("Carrinho vazio!");
         }
-        final float finalTotalCarrinho = totalCarrinho;
-        checkout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BDItens dbHelper = new BDItens(getApplicationContext());
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                Gson gson = new Gson();
-                String inputString = gson.toJson(itens);
-                for (Item i : itens) {
-                    long rowId = db.delete("tblItem", "id=?", new String[]{Integer.toString(i.getId())});
-                }
-                itens.clear();
-                db.close();
-                int random = new Random().nextInt(10000);
-                preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                String email = preferences.getString("email", "");
-                try {
-                    inserirEncomenda(new Encomenda(random, email, inputString, finalTotalCarrinho));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                int counter = preferences.getInt("image_data", 0);
-                counter = 0;
-                SharedPreferences.Editor edit = preferences.edit();
-                edit.putInt("image_data", counter);
-                edit.commit();
-                Intent myIntent = new Intent(getApplicationContext(), encomendas.Checkout.class);
-                myIntent.putExtra("numero", random);
-                startActivity(myIntent);
-            }
-        });
+    }
+
+    @OnClick(R.id.checkout)
+    public void checkout() {
+        BDItens dbHelper = new BDItens(getApplicationContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Gson gson = new Gson();
+        String inputString = gson.toJson(itens);
+        for (Item i : itens) {
+            long rowId = db.delete("tblItem", "id=?", new String[]{Integer.toString(i.getId())});
+        }
+        itens.clear();
+        db.close();
+        int random = new Random().nextInt(10000);
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String email = preferences.getString("email", "");
+        try {
+            inserirEncomenda(new Encomenda(random, email, inputString, totalCarrinho));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int counter = preferences.getInt("image_data", 0);
+        counter = 0;
+        SharedPreferences.Editor edit = preferences.edit();
+        edit.putInt("image_data", counter);
+        edit.commit();
+        Intent myIntent = new Intent(getApplicationContext(), encomendas.Checkout.class);
+        myIntent.putExtra("numero", random);
+        startActivity(myIntent);
     }
 
     private void inserirEncomenda(Encomenda p) throws Exception {

@@ -5,9 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-/**
- * Created by pmms8 on 1/14/2018.
- */
 
 public class BDEncomendas extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "encomendas.db";
