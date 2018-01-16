@@ -2,18 +2,20 @@ package catalogos;
 
 import android.graphics.Bitmap;
 
-public class DataModel {
+import java.io.Serializable;
+
+public class Image implements Serializable {
     private String name;
-    private URLlist url;
+    private LinkImagem url;
     private boolean isFromDataBase;
     private Bitmap picture;
 
-    public DataModel(String name, URLlist url) {
+    public Image(String name, LinkImagem url) {
         this.name = name;
         this.url = url;
     }
 
-    public DataModel() {
+    public Image() {
     }
 
     public String getName() {
@@ -24,11 +26,11 @@ public class DataModel {
         this.name = name;
     }
 
-    public URLlist getUrl() {
+    public LinkImagem getUrl() {
         return url;
     }
 
-    public void setUrl(URLlist url) {
+    public void setUrl(LinkImagem url) {
         this.url = url;
     }
 

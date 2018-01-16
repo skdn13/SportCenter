@@ -8,17 +8,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-
 import java.util.List;
 
 import pt.ipp.estg.sportcenter.R;
 
 
-public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
+public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     private Context mContext;
-    private List<DataModel> mImages;
+    private List<Image> mImages;
 
-    public DataAdapter(Context mContext, List<DataModel> mImages) {
+    public ImageAdapter(Context mContext, List<Image> mImages) {
         this.mContext = mContext;
         this.mImages = mImages;
     }
@@ -27,11 +26,8 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         return mContext;
     }
 
-    public void addData(DataModel data){
-        this.mImages.add(data);
-    }
     @Override
-    public DataAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ImageAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View contactView = inflater.inflate(R.layout.image_separator, parent, false);
@@ -40,12 +36,22 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        DataModel currFlower = this.mImages.get(position);
+        Image currFlower = this.mImages.get(position);
         if (currFlower.isFromDataBase()) {
             holder.imageView.setImageBitmap(currFlower.getPicture());
         } else {
             Picasso.with(holder.itemView.getContext()).load(currFlower.getUrl().getMedium()).into(holder.imageView);
         }
+    }
+
+    public void reset() {
+        mImages.clear();
+        notifyDataSetChanged();
+    }
+
+    public void addData(Image image) {
+        mImages.add(image);
+        //notifyDataSetChanged();
     }
 
     @Override

@@ -1,9 +1,11 @@
 package catalogos;
 
-public class URLlist{
+import java.io.Serializable;
+
+public class LinkImagem implements Serializable {
     private String medium;
 
-    public URLlist(String medium) {
+    public LinkImagem(String medium) {
         this.medium = medium;
     }
 

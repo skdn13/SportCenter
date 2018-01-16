@@ -1,6 +1,7 @@
 package pt.ipp.estg.sportcenter;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -72,7 +73,7 @@ public class EcraInicial extends AppCompatActivity {
                 if (location != null) {
                     Log.d("latitude", String.valueOf(location.getLatitude()));
                     Log.d("longitude", String.valueOf(location.getLongitude()));
-                    if (location.getLatitude() == 41.088095 && location.getLongitude() == -8.2439617) {
+                    if ((location.getLatitude() == 41.0880933 || location.getLatitude() == 41.0880917) && (location.getLongitude() == -8.2439617 || location.getLongitude() ==  -8.2439633)) {
                         enviarNotificacao();
                     }
                 }
@@ -99,10 +100,14 @@ public class EcraInicial extends AppCompatActivity {
     }
 
     private void enviarNotificacao() {
+        Intent i = new Intent(this, Promocoes.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_ONE_SHOT);
         NotificationCompat.Builder notification = new NotificationCompat.Builder(getApplicationContext());
         notification.setContentTitle("SportCenter");
         notification.setContentText("Olá! Vemos que está próximo da nossa loja, visite-nos!");
         notification.setAutoCancel(true);
+        notification.setContentIntent(pi);
         notification.setSmallIcon(R.drawable.ic_stat_name);
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(1, notification.build());

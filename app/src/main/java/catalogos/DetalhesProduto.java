@@ -11,7 +11,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -21,8 +20,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +41,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DetalhesProduto extends AppCompatActivity implements DataFetchListner {
+public class DetalhesProduto extends AppCompatActivity implements ImageListener {
     @BindView(R.id.textView9)
     TextView nome;
     @BindView(R.id.textView13)
@@ -61,11 +58,10 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
     private Float text6 = null, precoPromocao = null;
     private List<Product> details;
     private String nomeProduto = "";
-    private DataAdapter adapter2;
-    private ArrayList<DataModel> images;
-    private RestManager mRestManager;
+    private ImageAdapter adapter2;
+    private ArrayList<Image> images;
+    private REST mREST;
     private BDImagens mDatabase;
-    private DataFetchListner lis;
     private SharedPreferences preferences;
 
     @Override
@@ -79,7 +75,8 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         nomeProduto = getIntent().getStringExtra("text");
         this.details = new ArrayList<>();
-        mRestManager = new RestManager();
+        mREST = new REST();
+        mDatabase = new BDImagens(this);
         nome.setText(nomeProduto);
         reloadProductDetails((ArrayList<Product>) details);
         for (Product d : details) {
@@ -103,24 +100,31 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
             preco.setText(String.valueOf(text6) + "€");
         }
         images = new ArrayList<>();
-        images.add(new DataModel("RipCurl", new URLlist("https://photos6.spartoo.pt/photos/594/5946468/5946468_500_A.jpg")));
-        images.add(new DataModel("Billa", new URLlist("https://static.lvengine.net/bazardesportivo/Imgs/produtos/product_35806/f2ls06bif7-21_.jpg")));
-        images.add(new DataModel("Chinelos", new URLlist("http://i.overboard.com.br/imagens/produtos/0471717003/Detalhes2/chinelo-quiksilver-basis-nitro-preto.jpg")));
-        images.add(new DataModel("Nike", new URLlist("http://static5.netshoes.net/Produtos/calca-nike-drifit-racer-knit-track-masculina/66/D12-5977-266/D12-5977-266_zoom1.jpg")));
-        images.add(new DataModel("Puma", new URLlist("https://images.sportsdirect.com/images/products/59701202_l.jpg")));
-        images.add(new DataModel("Adidas", new URLlist("http://youridstore.com.br/media/catalog/product/cache/1/image/950x/472321edac810f9b2465a359d8cdc0b5/b/k/bk7634-_273_-2.jpg")));
-        adapter2 = new DataAdapter(this, images);
+        images.add(new Image("RipCurl", new LinkImagem("https://photos6.spartoo.pt/photos/594/5946468/5946468_500_A.jpg")));
+        images.add(new Image("Chinelos", new LinkImagem("http://i.overboard.com.br/imagens/produtos/0471717003/Detalhes2/chinelo-quiksilver-basis-nitro-preto.jpg")));
+        images.add(new Image("Nike", new LinkImagem("http://static5.netshoes.net/Produtos/calca-nike-drifit-racer-knit-track-masculina/66/D12-5977-266/D12-5977-266_zoom1.jpg")));
+        images.add(new Image("Puma", new LinkImagem("https://images.sportsdirect.com/images/products/59701202_l.jpg")));
+        images.add(new Image("Adidas", new LinkImagem("http://youridstore.com.br/media/catalog/product/cache/1/image/950x/472321edac810f9b2465a359d8cdc0b5/b/k/bk7634-_273_-2.jpg")));
+        adapter2 = new ImageAdapter(this, images);
         adapter2.notifyDataSetChanged();
         RecyclerView rvImages = findViewById(R.id.rvImages);
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         rvImages.addItemDecoration(itemDecoration);
         rvImages.setAdapter(adapter2);
         rvImages.setLayoutManager(new LinearLayoutManager(this));
-        if (Utility.isNetworkAvailable(this)) {
-            this.loadData();
-        } else {
-            mDatabase.fetchData(lis);
-        }
+        getFeed();
+    }
+
+    private void getFeed() {
+        // adapter2.reset();
+        if (Utility.isNetworkAvailable(getApplicationContext())) {
+            loadData();
+        } else getFeedFromDatabase();
+
+    }
+
+    private void getFeedFromDatabase() {
+        mDatabase.fetchData(this);
     }
 
     @OnClick(R.id.button2)
@@ -229,20 +233,20 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
         return new BitmapDrawable(getResources(), bitmap);
     }
 
-    public class SaveIntoDatabase extends AsyncTask<DataModel, Void, Void> {
+    public class SaveIntoDatabase extends AsyncTask<Image, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
         }
 
         @Override
-        protected Void doInBackground(DataModel... params) {
-            DataModel dataModel = params[0];
+        protected Void doInBackground(Image... params) {
+            Image image = params[0];
             try {
-                InputStream inputStream = new URL(dataModel.getUrl().getMedium()).openStream();
+                InputStream inputStream = new URL(image.getUrl().getMedium()).openStream();
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                dataModel.setPicture(bitmap);
-                mDatabase.addData(dataModel);
+                image.setPicture(bitmap);
+                mDatabase.addData(image);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -251,36 +255,35 @@ public class DetalhesProduto extends AppCompatActivity implements DataFetchListn
     }
 
     private void loadData() {
-        Call<List<DataModel>> listData = mRestManager.getFlowerService().getAllData();
-        listData.enqueue(new Callback<List<DataModel>>() {
+        Call<List<Image>> listData = mREST.getFlowerService().getAllData();
+        listData.enqueue(new Callback<List<Image>>() {
             @Override
-            public void onResponse(Call<List<DataModel>> call, Response<List<DataModel>> response) {
+            public void onResponse(Call<List<Image>> call, Response<List<Image>> response) {
                 if (response.isSuccessful()) {
-                    List<DataModel> datalist = response.body();
+                    List<Image> datalist = response.body();
                     for (int i = 0; i < datalist.size(); i++) {
-                        DataModel data = datalist.get(i);
+                        Image data = datalist.get(i);
                         SaveIntoDatabase task = new SaveIntoDatabase();
                         task.execute(data);
                         adapter2.addData(data);
                     }
                 }
             }
+
             @Override
-            public void onFailure(Call<List<DataModel>> call, Throwable t) {
+            public void onFailure(Call<List<Image>> call, Throwable t) {
             }
         });
 
     }
 
     @Override
-    public void onDeliverData(DataModel dataModel) {
-// pass data to adapter to display in recycler
-        adapter2.addData(dataModel);
+    public void onDeliverData(Image image) {
+        adapter2.addData(image);
     }
 
     @Override
     public void onHideDialog() {
-// hide dialog here
     }
 
     public void reloadProductDetails(ArrayList<Product> list) {

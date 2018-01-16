@@ -2,17 +2,22 @@ package basesDeDados;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Handler;
+import android.os.Looper;
 
-import catalogos.DataFetchListner;
-import catalogos.DataFetcher;
-import catalogos.DataModel;
+import java.util.ArrayList;
+import java.util.List;
+
+import catalogos.ImageListener;
+import catalogos.Image;
 import pt.ipp.estg.sportcenter.Utility;
 
 
 public class BDImagens extends SQLiteOpenHelper {
-    private static final String DB_NAME = "images";
+    private static final String DB_NAME = "images.db";
     private static final int DB_VERSION = 1;
     public static final String TABLE_NAME = "image";
     public static final String DROP_QUERY = "DROP TABLE IF EXIST " + TABLE_NAME;
@@ -41,18 +46,65 @@ public class BDImagens extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
-    public void addData(DataModel dataModel) {
+    public void addData(Image image) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(PHOTO_URL, dataModel.getUrl().getMedium());
-        values.put(PHOTO, Utility.getPictureByteOfArray(dataModel.getPicture()));
-        values.put(TITLE, dataModel.getName());
+        values.put(PHOTO_URL, image.getUrl().getMedium());
+        values.put(PHOTO, Utility.getPictureByteOfArray(image.getPicture()));
+        values.put(TITLE, image.getName());
         db.insert(TABLE_NAME, null, values);
         db.close();
     }
 
-    public void fetchData(DataFetchListner listener) {
+    public void fetchData(ImageListener listener) {
         DataFetcher fetcher = new DataFetcher(listener, this.getWritableDatabase());
         fetcher.start();
+    }
+
+    public class DataFetcher extends Thread {
+        private final ImageListener mListener;
+        private final SQLiteDatabase mDb;
+
+        public DataFetcher(ImageListener listener, SQLiteDatabase db) {
+            mListener = listener;
+            mDb = db;
+        }
+
+        @Override
+        public void run() {
+            Cursor cursor = mDb.rawQuery(GET_IMAGE_QUERY, null);
+            final List<Image> dataList = new ArrayList<>();
+            if (cursor.getCount() > 0) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        Image data = new Image();
+                        data.setFromDatabase(true);
+                        data.setPicture(Utility.getBitmapFromByte(cursor.getBlob(cursor.getColumnIndex(PHOTO))));
+                        data.setName(cursor.getString(cursor.getColumnIndex(TITLE)));
+                        dataList.add(data);
+                        publishFlower(data);
+                    } while (cursor.moveToNext());
+                }
+            }
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onHideDialog();
+
+                }
+            });
+            cursor.close();
+        }
+
+        public void publishFlower(final Image data) {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onDeliverData(data);
+                }
+            });
+        }
     }
 }
