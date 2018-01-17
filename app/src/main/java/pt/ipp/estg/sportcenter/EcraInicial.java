@@ -73,7 +73,7 @@ public class EcraInicial extends AppCompatActivity {
                 if (location != null) {
                     Log.d("latitude", String.valueOf(location.getLatitude()));
                     Log.d("longitude", String.valueOf(location.getLongitude()));
-                    if ((location.getLatitude() == 41.0880933 || location.getLatitude() == 41.0880917) && (location.getLongitude() == -8.2439617 || location.getLongitude() ==  -8.2439633)) {
+                    if ((location.getLatitude() >= 41.088 || location.getLatitude() <= 41.0882) && (location.getLongitude() <= -8.2439 || location.getLongitude() >= -8.2449)) {
                         enviarNotificacao();
                     }
                 }
