@@ -19,7 +19,7 @@
         android:id="@+id/morada"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Morada"
+        android:text="@string/morada"
         android:textAlignment="center"
         android:textSize="20sp" />
 
@@ -27,7 +27,7 @@
         android:id="@+id/moradaT"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Rua do Ordonho de Cima, nº 61"
+        android:text="@string/rua_do_ordonho_de_cima_n_61"
         android:textAlignment="center"
         android:textSize="14sp" />
 
@@ -35,7 +35,7 @@
         android:id="@+id/localidade"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Localidade"
+        android:text="@string/localidade"
         android:textAlignment="center"
         android:textSize="20sp" />
 
@@ -43,7 +43,7 @@
         android:id="@+id/lcoalidadeT"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="4575-036, Alpendurada e Matos"
+        android:text="@string/_4575_036_alpendurada_e_matos"
         android:textAlignment="center"
         android:textSize="14sp" />
 
@@ -51,7 +51,7 @@
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Email"
+        android:text="@string/email"
         android:textAlignment="center"
         android:textSize="20sp" />
 
@@ -59,7 +59,7 @@
         android:id="@+id/emailT"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="sportcenter@gmail.com"
+        android:text="@string/sportcenter_gmail_com"
         android:textAlignment="center"
         android:textSize="14sp" />
 
@@ -67,7 +67,7 @@
         android:id="@+id/telefone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Telefone"
+        android:text="@string/telefone"
         android:textAlignment="center"
         android:textSize="20sp" />
 
@@ -75,19 +75,17 @@
         android:id="@+id/telefoneT"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="255611611"
+        android:text="@string/_255611611"
         android:textAlignment="center"
         android:textSize="14sp" />
 
     <view
+        android:id="@+id/view2"
         class="android.support.v4.widget.Space"
-        id="@+id/view2"
-        layout_width="match_parent"
         android:layout_width="match_parent"
         android:layout_height="20sp" />
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"

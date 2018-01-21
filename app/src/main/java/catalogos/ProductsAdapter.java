@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import butterknife.BindBitmap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;

@@ -38,7 +38,6 @@
         <activity android:name="encomendas.Checkout" />
         <activity android:name="encomendas.Historico" />
         <activity android:name="catalogos.Promocoes" />
-        <activity android:name="catalogos.FragmentSwitcher" />
         <activity
             android:name="login.LoginActivity"
             android:label="@string/title_activity_login">

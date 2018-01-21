@@ -64,7 +64,7 @@ public class ProductFragment extends Fragment {
                 mContentView = inflater.inflate(R.layout.recycler, container, false);
         adapter = new ProductsAdapter(getActivity(), products);
         adapter.notifyDataSetChanged();
-        RecyclerView rvProducts = mContentView.findViewById(R.id.rvProducts);
+        RecyclerView rvProducts = mContentView.findViewById(R.id.rvProducts1);
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
         rvProducts.addItemDecoration(itemDecoration);
         rvProducts.setLayoutManager(new LinearLayoutManager(getActivity()));
