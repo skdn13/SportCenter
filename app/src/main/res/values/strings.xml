@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">SportCenter</string>
     <string name="notification_weather">Ativar as notificações</string>
-    <string name="not_weather">Ativar as notificações</string>
+    <string name="not_weather">Terminar sessão</string>
     <string name="pref_languages_default">Português</string>
     <string name="title_activity_login">SportCenter</string>
 
@@ -111,4 +111,5 @@
     <string name="_99">99</string>
     <string name="carrinho">Carrinho</string>
     <string name="carrinho_de_compras">Carrinho de Compras</string>
+    <string name="logOutC">Logout</string>
 </resources>

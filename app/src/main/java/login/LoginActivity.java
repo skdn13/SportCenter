@@ -3,24 +3,22 @@ package login;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.ContentValues;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
-
+import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -32,13 +30,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
+import basesDeDados.BDUtilizadores;
 import pt.ipp.estg.sportcenter.EcraInicial;
 import pt.ipp.estg.sportcenter.R;
-import basesDeDados.BDUtilizadores;
+import pt.ipp.estg.sportcenter.Utility;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -59,6 +61,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        // FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Bem-vindo!");
         setSupportActionBar(myToolbar);
@@ -254,6 +257,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
+        private DatabaseReference mFirebaseDatabase;
+        private FirebaseDatabase mFirebaseInstance;
+        private String userID;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -261,6 +267,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         private void inserirUtilizador(String email, String hash) throws Exception {
+            if (Utility.isNetworkAvailable(getApplicationContext())) {
+                mFirebaseInstance = FirebaseDatabase.getInstance();
+                mFirebaseDatabase = mFirebaseInstance.getReference("users");
+                userID = mFirebaseDatabase.push().getKey();
+                mFirebaseDatabase.child(userID).setValue(email);
+            }
             BDUtilizadores dbHelper = new BDUtilizadores(getApplicationContext());
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();

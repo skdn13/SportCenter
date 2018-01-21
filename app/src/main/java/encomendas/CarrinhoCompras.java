@@ -16,25 +16,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 import basesDeDados.BDEncomendas;
 import basesDeDados.BDItens;
-import basesDeDados.BDProduto;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import catalogos.Product;
-import catalogos.ProductsAdapter;
 import pt.ipp.estg.sportcenter.R;
 
 
@@ -123,6 +115,7 @@ public class CarrinhoCompras extends AppCompatActivity {
             throw new Exception("Não foi possível inserir o item na Base de Dados");
         }
     }
+
 
     public void reloadItemList(ArrayList<Item> list) {
         BDItens
