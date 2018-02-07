@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.List;
@@ -24,10 +23,6 @@ public class EncomendaAdapter extends RecyclerView.Adapter<encomendas.EncomendaA
         this.mContext = context;
     }
 
-    public Context getmContext() {
-        return mContext;
-    }
-
     @Override
     public encomendas.EncomendaAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
@@ -43,7 +38,6 @@ public class EncomendaAdapter extends RecyclerView.Adapter<encomendas.EncomendaA
         final Encomenda product = this.mItens.get(position);
         viewHolder.numeroEncomenda.setText("Ref: " + String.valueOf(product.getNumero()));
         viewHolder.preco.setText("Total: " + String.valueOf(product.getTotal()));
-        viewHolder.detalhes.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -57,9 +51,6 @@ public class EncomendaAdapter extends RecyclerView.Adapter<encomendas.EncomendaA
         TextView numeroEncomenda;
         @BindView(R.id.preco)
         TextView preco;
-        @BindView(R.id.button)
-        Button detalhes;
-
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);

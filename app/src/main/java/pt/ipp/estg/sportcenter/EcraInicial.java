@@ -32,6 +32,8 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import basesDeDados.BDProduto;
 import butterknife.ButterKnife;
@@ -47,6 +49,9 @@ public class EcraInicial extends AppCompatActivity {
     private LocationRequest mLocationRequest;
     private LocationCallback mLocationCallback;
     private SharedPreferences preferences;
+    private DatabaseReference mFirebaseDatabase;
+    private String productID;
+    private FirebaseDatabase mFirebaseInstance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +104,11 @@ public class EcraInicial extends AppCompatActivity {
         startLocationUpdates();
     }
 
+    public void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
+    }
+
     private void enviarNotificacao() {
         Intent i = new Intent(this, Promocoes.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -116,6 +126,12 @@ public class EcraInicial extends AppCompatActivity {
     @OnClick(R.id.a)
     public void Catalogos() {
         Intent intent = new Intent(getApplicationContext(), EcraCatalogos.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.topWishs)
+    public void Top() {
+        Intent intent = new Intent(getApplicationContext(), TopDash.class);
         startActivity(intent);
     }
 
@@ -142,17 +158,40 @@ public class EcraInicial extends AppCompatActivity {
     }
 
     private void insertAllProducts() throws Exception {
-        inserirProduto(new Product("Sim", 5.95f, 10.95f, "Tshirt RipCurl", "Feminino", 1, "M", "Azul", "...", "100% Algodão", "Sim"));
-        inserirProduto(new Product("Não", 20.95f, 20.95f, "Camisola BillaBong", "Masculino", 2, "XL", "Preto", "...", "100% Algodão", "Sim"));
-        inserirProduto(new Product("Não", 5.95f, 5.95f, "Chinelos Roxy", "Feminino", 3, "36", "Rosa", "...", "100% Algodão", "Sim"));
-        inserirProduto(new Product("Não", 4.95f, 4.95f, "Chinelos QuickSilver", "Masculino", 4, "44", "Verde", "...", "100% Algodão", "Sim"));
-        inserirProduto(new Product("Não", 12.95f, 12.95f, "Calças Nike", "Crianca", 5, "16", "Amarelo", "...", "100% Algodão", "Sim"));
-        inserirProduto(new Product("Não", 34.95f, 34.95f, "Calções Adidas", "Masculino", 6, "XL", "Cinzento", "...", "100% Algodão", "Sim"));
-        inserirProduto(new Product("Não", 28.95f, 28.95f, "Sweat Asics", "Feminino", 7, "S", "Branco", "...", "100% Algodão", "Sim"));
-        inserirProduto(new Product("Sim", 12.95f, 24.95f, "Tshirt Puma", "Crianca", 8, "14", "Preto", "...", "100% Algodão", "Sim"));
-        inserirProduto(new Product("Sim", 60.95f, 80.0f, "Sapatilhas New Balance", "Masculino", 9, "42", "Laranja", "...", "100% Algodão", "Sim"));
-        inserirProduto(new Product("Sim", 8.95f, 10.0f, "Gorro Berg", "Feminino", 10, "L", "Verde", "...", "100% Algodão", "Sim"));
-        inserirProduto(new Product("Sim", 7.50f, 12.0f, "Cachecol Adidas", "Crianca", 11, "S", "Azul", "...", "100% Algodão", "Sim"));
+        Product p1 = new Product("Sim", 5.95f, 10.95f, "Tshirt RipCurl", "Feminino", 1, "M", "Azul", "...", "100% Algodão", "Sim");
+        Product p2 = new Product("Não", 20.95f, 20.95f, "Camisola BillaBong", "Masculino", 2, "XL", "Preto", "...", "100% Algodão", "Sim");
+        Product p3 = new Product("Não", 5.95f, 5.95f, "Chinelos Roxy", "Feminino", 3, "36", "Rosa", "...", "100% Algodão", "Sim");
+        Product p4 = new Product("Não", 4.95f, 4.95f, "Chinelos QuickSilver", "Masculino", 4, "44", "Verde", "...", "100% Algodão", "Sim");
+        Product p5 = new Product("Não", 12.95f, 12.95f, "Calças Nike", "Crianca", 5, "16", "Amarelo", "...", "100% Algodão", "Sim");
+        Product p6 = new Product("Não", 34.95f, 34.95f, "Calções Adidas", "Masculino", 6, "XL", "Cinzento", "...", "100% Algodão", "Sim");
+        Product p7 = new Product("Não", 28.95f, 28.95f, "Sweat Asics", "Feminino", 7, "S", "Branco", "...", "100% Algodão", "Sim");
+        Product p8 = new Product("Sim", 12.95f, 24.95f, "Tshirt Puma", "Crianca", 8, "14", "Preto", "...", "100% Algodão", "Sim");
+        Product p9 = new Product("Sim", 60.95f, 80.0f, "Sapatilhas New Balance", "Masculino", 9, "42", "Laranja", "...", "100% Algodão", "Sim");
+        Product p10 = new Product("Sim", 8.95f, 10.0f, "Gorro Berg", "Feminino", 10, "L", "Verde", "...", "100% Algodão", "Sim");
+        Product p11 = new Product("Sim", 7.50f, 12.0f, "Cachecol Adidas", "Crianca", 11, "S", "Azul", "...", "100% Algodão", "Sim");
+
+        gravarFirebase(p1);
+        gravarFirebase(p2);
+        gravarFirebase(p3);
+        gravarFirebase(p4);
+        gravarFirebase(p5);
+        gravarFirebase(p6);
+        gravarFirebase(p7);
+        gravarFirebase(p8);
+        gravarFirebase(p9);
+        gravarFirebase(p10);
+        gravarFirebase(p11);
+        inserirProduto(p1);
+        inserirProduto(p2);
+        inserirProduto(p3);
+        inserirProduto(p4);
+        inserirProduto(p5);
+        inserirProduto(p6);
+        inserirProduto(p7);
+        inserirProduto(p8);
+        inserirProduto(p9);
+        inserirProduto(p10);
+        inserirProduto(p11);
     }
 
     private void startLocationUpdates() {
@@ -185,13 +224,33 @@ public class EcraInicial extends AppCompatActivity {
         values.put("cor", p.getCor());
         values.put("composicao", p.getComposicao());
         values.put("imagem", p.getImagem());
-        values.put("disponivel", p.isDisponivel());
+        values.put("disponivel", p.getDisponivel());
         values.put("promocao", p.getPromocao());
         values.put("precoPromocao", p.getPrecoPromocao());
+        values.put("favorito", p.getFavourited());
         long rowId = db.insert("tblProduto", null, values);
         db.close();
         if (rowId < 0) {
             throw new Exception("Não foi possível inserir o produto na Base de Dados");
+        }
+    }
+
+    public void gravarFirebase(Product product) {
+        if (Utility.isNetworkAvailable(getApplicationContext())) {
+            mFirebaseInstance = FirebaseDatabase.getInstance();
+            mFirebaseDatabase = mFirebaseInstance.getReference("products");
+            productID = String.valueOf(product.getReferencia());
+            mFirebaseDatabase.child(productID).child("Nome").setValue(product.getNome());
+            mFirebaseDatabase.child(productID).child("Tamanho").setValue(product.getTamanho());
+            mFirebaseDatabase.child(productID).child("Promoção").setValue(product.getPromocao());
+            mFirebaseDatabase.child(productID).child("Preço Normal").setValue(product.getPreco());
+            mFirebaseDatabase.child(productID).child("Sexo").setValue(product.getSexo());
+            mFirebaseDatabase.child(productID).child("Imagem").setValue(product.getImagem());
+            mFirebaseDatabase.child(productID).child("Cor").setValue(product.getCor());
+            mFirebaseDatabase.child(productID).child("Preço Promoção").setValue(product.getPrecoPromocao());
+            mFirebaseDatabase.child(productID).child("Disponível").setValue(product.getDisponivel());
+            mFirebaseDatabase.child(productID).child("Composição").setValue(product.getComposicao());
+            mFirebaseDatabase.child(productID).child("Num Favoritos").setValue(product.getFavourited());
         }
     }
 
@@ -236,9 +295,12 @@ public class EcraInicial extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem menuItem = menu.findItem(R.id.badge);
+        MenuItem menuItem2 = menu.findItem(R.id.wish);
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int counter = preferences.getInt("image_data", 0);
         menuItem.setIcon(buildCounterDrawable(counter, R.drawable.ic_action_cart));
+        int counterWishs = preferences.getInt("wishs", 0);
+        menuItem2.setIcon(buildCounterDrawable(counterWishs, R.drawable.fav));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -250,6 +312,9 @@ public class EcraInicial extends AppCompatActivity {
                 return true;
             case R.id.badge:
                 startActivity(new Intent(getApplicationContext(), encomendas.CarrinhoCompras.class));
+                return true;
+            case R.id.wish:
+                startActivity(new Intent(getApplicationContext(), encomendas.Wishlist.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

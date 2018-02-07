@@ -7,16 +7,18 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -28,15 +30,25 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pt.ipp.estg.sportcenter.R;
+import pt.ipp.estg.sportcenter.Utility;
 
 
 public class CarrinhoCompras extends AppCompatActivity {
     private ArrayList<Item> itens;
     private ItemAdapter adapter;
     private SharedPreferences preferences;
+    private ItemTouchHelper.SimpleCallback simpleItemTouchCallback;
     @BindView(R.id.checkout)
-    Button checkout;
+    FloatingActionButton checkout;
+    @BindView(R.id.textView20)
+    TextView total;
+    @BindView(R.id.carr)
+    TextView carrinho;
     private float totalCarrinho = 0;
+    private FirebaseDatabase mFirebaseInstance;
+    private DatabaseReference mFirebaseDatabase;
+    private String itemID;
+    private String encomendaID;
 
     /**
      * Called when the activity is first created.
@@ -51,17 +63,16 @@ public class CarrinhoCompras extends AppCompatActivity {
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         RecyclerView rvProducts = findViewById(R.id.rvItens);
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-        rvProducts.addItemDecoration(itemDecoration);
         itens = new ArrayList<>();
         reloadItemList(itens);
-        TextView total = findViewById(R.id.textView20);
-        TextView carrinho = findViewById(R.id.carr);
         for (Item f : itens) {
             totalCarrinho += f.getPreco();
         }
         total.append(": " + String.valueOf(totalCarrinho) + "€");
         adapter = new ItemAdapter(this, itens);
+        swipe();
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(rvProducts);
         adapter.notifyDataSetChanged();
         rvProducts.setAdapter(adapter);
         rvProducts.setLayoutManager(new LinearLayoutManager(this));
@@ -72,25 +83,58 @@ public class CarrinhoCompras extends AppCompatActivity {
         }
     }
 
+    public void swipe() {
+        this.simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                BDItens dbHelper = new BDItens(getApplicationContext());
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                long rowId = db.delete("tblItem", "id=?", new String[]{Integer.toString(adapter.getID(viewHolder.getAdapterPosition()))});
+                db.close();
+                preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                int counter = preferences.getInt("image_data", 0);
+                counter--;
+                SharedPreferences.Editor edit = preferences.edit();
+                edit.putInt("image_data", counter);
+                edit.commit();
+                totalCarrinho -= adapter.getPreco(viewHolder.getAdapterPosition());
+                adapter.remove(viewHolder.getAdapterPosition());
+                total.setText("Total");
+                total.append(": " + String.valueOf(totalCarrinho) + "€");
+                adapter.notifyDataSetChanged();
+            }
+        };
+    }
+
     @OnClick(R.id.checkout)
     public void checkout() {
         BDItens dbHelper = new BDItens(getApplicationContext());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Gson gson = new Gson();
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String inputString = gson.toJson(itens);
         for (Item i : itens) {
+            apagarFirebase(i);
             long rowId = db.delete("tblItem", "id=?", new String[]{Integer.toString(i.getId())});
         }
         itens.clear();
         db.close();
         int random = new Random().nextInt(10000);
-        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String email = preferences.getString("email", "");
+        Encomenda enc = new Encomenda(random, email, inputString, totalCarrinho);
+        gravarFirebase(enc);
         try {
-            inserirEncomenda(new Encomenda(random, email, inputString, totalCarrinho));
+            inserirEncomenda(enc);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         int counter = preferences.getInt("image_data", 0);
         counter = 0;
         SharedPreferences.Editor edit = preferences.edit();
@@ -116,6 +160,34 @@ public class CarrinhoCompras extends AppCompatActivity {
         }
     }
 
+    public void apagarFirebase(Item item) {
+        if (Utility.isNetworkAvailable(getApplicationContext())) {
+            mFirebaseInstance = FirebaseDatabase.getInstance();
+            String email = preferences.getString("email", "");
+            String ref = "itens-" + email;
+            String refS = ref.replaceAll("@", "-");
+            String refSS = refS.replaceAll("\\.", "-");
+            mFirebaseDatabase = mFirebaseInstance.getReference(refSS);
+            itemID = String.valueOf(item.getId());
+            mFirebaseDatabase.child(itemID).removeValue();
+        }
+    }
+
+    public void gravarFirebase(Encomenda encomenda) {
+        if (Utility.isNetworkAvailable(getApplicationContext())) {
+            mFirebaseInstance = FirebaseDatabase.getInstance();
+            preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String email = preferences.getString("email", "");
+            String ref = "encomendas-" + email;
+            String refS = ref.replaceAll("@", "-");
+            String refSS = refS.replaceAll("\\.", "-");
+            mFirebaseDatabase = mFirebaseInstance.getReference(refSS);
+            encomendaID = String.valueOf(encomenda.getNumero());
+            mFirebaseDatabase.child(itemID).child("Nome").setValue(encomenda.getNome());
+            mFirebaseDatabase.child(itemID).child("Valor").setValue(encomenda.getTotal());
+            mFirebaseDatabase.child(itemID).child("Conteúdo").setValue(encomenda.getConteudo());
+        }
+    }
 
     public void reloadItemList(ArrayList<Item> list) {
         BDItens

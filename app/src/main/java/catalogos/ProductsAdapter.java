@@ -3,11 +3,11 @@ package catalogos;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,7 +15,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import pt.ipp.estg.sportcenter.R;
 
 
@@ -42,17 +41,23 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(ProductsAdapter.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(final ProductsAdapter.ViewHolder viewHolder, int position) {
         Product product = this.mProducts.get(position);
         viewHolder.nameTextView.setText(product.getNome());
+        viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(mContext, DetalhesProduto.class);
+                myIntent.putExtra("text", viewHolder.nameTextView.getText().toString());
+                mContext.startActivity(myIntent);
+            }
+        });
         if (product.getPromocao().equals("Sim")) {
-            viewHolder.preco.setText("Antigo: " + String.valueOf(product.getPreco()) + "€, Novo: " + String.valueOf(product.getPrecoPromocao()) + "€");
+            viewHolder.preco.setText(String.valueOf(product.getPrecoPromocao()) + "€");
         } else {
-            viewHolder.preco.setText("Preço: " + String.valueOf(product.getPreco()) + "€");
+            viewHolder.preco.setText(String.valueOf(product.getPreco()) + "€");
         }
-        viewHolder.button.setText(product.isDisponivel().equals("Sim") ? "Detalhes" : "Indisponível");
-        viewHolder.button.setEnabled(product.isDisponivel().equals("Sim"));
-        if (product.isDisponivel().equals("Sim")) {
+        if (product.getDisponivel().equals("Sim")) {
             viewHolder.imageView.setImageDrawable(ContextCompat.getDrawable(getmContext(), R.drawable.ic_action2_name));
         } else {
             viewHolder.imageView.setImageDrawable(ContextCompat.getDrawable(getmContext(), R.drawable.ic_action3_name));
@@ -72,14 +77,9 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         TextView preco;
         @BindView(R.id.imageView)
         ImageView imageView;
-        @BindView(R.id.button)
-        Button button;
-        @OnClick(R.id.button)
-        public void detalhes() {
-            Intent myIntent = new Intent(mContext, DetalhesProduto.class);
-            myIntent.putExtra("text", nameTextView.getText().toString());
-            mContext.startActivity(myIntent);
-        }
+        @BindView(R.id.item)
+        CardView cardView;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);

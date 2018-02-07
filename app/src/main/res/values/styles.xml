@@ -5,6 +5,16 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/orange</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:textColorPrimary">@color/backgroundcolor</item>
+        <item name="android:textColorSecondary">@color/backgroundcolor</item>
+        <item name="android:textColor">@color/backgroundcolor</item>
+        <item name="android:textColorHint">@color/backgroundcolor</item>
+    </style>
+
+    <style name="AlertDialog" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:textColor">@color/backgroundcolor</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
     </style>
 </resources>

@@ -16,7 +16,7 @@ public class BDProduto extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE tblProduto (referencia INTEGER PRIMARY KEY, preco FLOAT NOT NULL, sexo VARCHAR(20) NOT NULL, nome VARCHAR(100)	NOT	NULL, tamanho VARCHAR(30) NOT NULL, cor VARCHAR(30) NOT NULL, composicao VARCHAR(50) NOT NULL, imagem VARCHAR(200) NOT NULL, disponivel VARCHAR(10) NOT NULL, promocao VARCHAR(10) NOT NULL, precoPromocao FLOAT NOT NULL)");
+        db.execSQL("CREATE TABLE tblProduto (referencia INTEGER PRIMARY KEY, preco FLOAT NOT NULL, sexo VARCHAR(20) NOT NULL, nome VARCHAR(100)	NOT	NULL, tamanho VARCHAR(30) NOT NULL, cor VARCHAR(30) NOT NULL, composicao VARCHAR(50) NOT NULL, imagem VARCHAR(200) NOT NULL, disponivel VARCHAR(10) NOT NULL, promocao VARCHAR(10) NOT NULL, precoPromocao FLOAT NOT NULL, favorito INTEGER NOT NULL)");
     }
 
     @Override

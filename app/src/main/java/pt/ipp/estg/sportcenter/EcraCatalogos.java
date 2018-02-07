@@ -1,33 +1,25 @@
 package pt.ipp.estg.sportcenter;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import basesDeDados.BDProduto;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import catalogos.ColecaoCrianca;
 import catalogos.ColecaoHomem;
 import catalogos.ColecaoMulher;
-import catalogos.Product;
 import catalogos.ProductActivity;
-import catalogos.Promocoes;
-import encomendas.Historico;
 
 
 public class EcraCatalogos extends AppCompatActivity {
@@ -42,6 +34,11 @@ public class EcraCatalogos extends AppCompatActivity {
         myToolbar.setTitle("SportCenter");
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    public void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
     }
 
     @OnClick(R.id.b)
@@ -104,9 +101,12 @@ public class EcraCatalogos extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem menuItem = menu.findItem(R.id.badge);
+        MenuItem menuItem2 = menu.findItem(R.id.wish);
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int counter = preferences.getInt("image_data", 0);
         menuItem.setIcon(buildCounterDrawable(counter, R.drawable.ic_action_cart));
+        int counterWishs = preferences.getInt("wishs", 0);
+        menuItem2.setIcon(buildCounterDrawable(counterWishs, R.drawable.fav));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -118,6 +118,9 @@ public class EcraCatalogos extends AppCompatActivity {
                 return true;
             case R.id.badge:
                 startActivity(new Intent(getApplicationContext(), encomendas.CarrinhoCompras.class));
+                return true;
+            case R.id.wish:
+                startActivity(new Intent(getApplicationContext(), encomendas.Wishlist.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

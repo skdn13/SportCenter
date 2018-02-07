@@ -12,6 +12,15 @@ public class Product {
     private float preco;
     private String promocao;
     private float precoPromocao;
+    private int favourited;
+
+    public int getFavourited() {
+        return favourited;
+    }
+
+    public void setFavourited(int favourited) {
+        this.favourited = favourited;
+    }
 
     public String getDisponivel() {
         return disponivel;
@@ -46,6 +55,7 @@ public class Product {
     }
 
     public Product(String emPromocao, float precoPromocao, float preco, String nome, String sexo, Integer referencia, String tamanho, String cor, String imagem, String composicao, String disponivel) {
+        this.favourited = 0;
         this.promocao = emPromocao;
         this.precoPromocao = precoPromocao;
         this.nome = nome;
@@ -113,10 +123,6 @@ public class Product {
 
     public void setComposicao(String composicao) {
         this.composicao = composicao;
-    }
-
-    public String isDisponivel() {
-        return disponivel;
     }
 
     public void setDisponivel(String disponivel) {

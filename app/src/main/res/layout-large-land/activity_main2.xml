@@ -9,15 +9,11 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/holo_orange_dark"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        android:minHeight="?attr/actionBarSize" />
 
-
-    <FrameLayout
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/frameLayout4"
-        android:layout_width="700dp"
+        android:layout_width="600dp"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
@@ -27,11 +23,28 @@
             android:id="@+id/rvImages"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-    </FrameLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="10dp"
+            android:src="@drawable/add" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floating2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:src="@drawable/add_wish"
+            app:layout_anchor="@+id/floating" />
+    </android.support.design.widget.CoordinatorLayout>
+
 
     <ScrollView
         android:id="@+id/scrollView4"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/toolbar">
@@ -110,7 +123,7 @@
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/textView17"
+                android:id="@+id/textView15"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
@@ -125,22 +138,11 @@
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/textView15"
+                android:id="@+id/textView17"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:textSize="16sp" />
-
-            <Button
-                android:id="@+id/button2"
-                style="@style/Widget.AppCompat.Button"
-                android:layout_width="wrap_content"
-                android:layout_height="64dp"
-                android:layout_gravity="end"
-                android:background="@android:color/holo_orange_dark"
-                android:text="@string/adicionar_ao_carrinho"
-                android:textAlignment="center"
-                android:visibility="visible" />
 
         </LinearLayout>
 

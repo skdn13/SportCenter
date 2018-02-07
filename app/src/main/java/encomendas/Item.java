@@ -1,9 +1,5 @@
 package encomendas;
 
-/**
- * Created by pmms8 on 1/13/2018.
- */
-
 public class Item {
     private int id;
     private float preco;
@@ -27,6 +23,11 @@ public class Item {
 
     public Item() {
 
+    }
+
+    public Item(int id, String nome) {
+        this.id = id;
+        this.nome = nome;
     }
 
     public int getId() {

@@ -115,7 +115,7 @@
     <string name="ver_todas_as_cole_es">Ver todas as coleções</string>
     <string name="todos_os_artigos">Todos os artigos</string>
     <string name="ver_artigos_para_crian_a">Ver artigos para criança</string>
-    <string name="crixan_a">Crixança</string>
+    <string name="crixan_a">Criança</string>
     <string name="ver_artigos_para_mulher">Ver artigos para mulher</string>
     <string name="mulher">Mulher</string>
     <string name="ver_artigos_para_homem">Ver artigos para homem</string>
@@ -145,4 +145,17 @@
     <string name="n_mero">Número:</string>
     <string name="voltar_ao_inicio">voltar ao inicio</string>
     <string name="detalhes">Detalhes</string>
+    <string name="add">add</string>
+    <string name="wishlist">Wishlist</string>
+    <string name="top_desejados">Top Desejados</string>
+    <string name="ver_os_produtos_mais_desejados">Ver os produtos mais desejados</string>
+    <string name="lista_de_desejos">Lista de desejos</string>
+    <string name="top_homem">Top Homem</string>
+    <string name="artigos_mais_desejados_para_homem">Artigos desejados para homem</string>
+    <string name="top_mulher">Top Mulher</string>
+    <string name="artigos_mais_desejados_para_mulher">Artigos desejados para mulher</string>
+    <string name="top_crian_a">Top Criança</string>
+    <string name="artigos_desejados_para_crian_a">Artigos desejados para criança</string>
+    <string name="top_artigos">Top Artigos</string>
+    <string name="ver_os_artigos_mais_desejados">Ver os artigos mais desejados</string>
 </resources>

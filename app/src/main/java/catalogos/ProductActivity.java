@@ -34,6 +34,11 @@ public class ProductActivity extends AppCompatActivity implements ProductListene
         getFragmentManager().beginTransaction().add(R.id.fragment_container, fragment).commit();
     }
 
+    public void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
@@ -70,9 +75,12 @@ public class ProductActivity extends AppCompatActivity implements ProductListene
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem menuItem = menu.findItem(R.id.badge);
+        MenuItem menuItem2 = menu.findItem(R.id.wish);
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int counter = preferences.getInt("image_data", 0);
         menuItem.setIcon(buildCounterDrawable(counter, R.drawable.ic_action_cart));
+        int counterWishs = preferences.getInt("wishs", 0);
+        menuItem2.setIcon(buildCounterDrawable(counterWishs, R.drawable.fav));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -84,6 +92,9 @@ public class ProductActivity extends AppCompatActivity implements ProductListene
                 return true;
             case R.id.badge:
                 startActivity(new Intent(getApplicationContext(), encomendas.CarrinhoCompras.class));
+                return true;
+            case R.id.wish:
+                startActivity(new Intent(getApplicationContext(), encomendas.Wishlist.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

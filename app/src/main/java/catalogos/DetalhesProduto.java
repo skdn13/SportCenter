@@ -10,12 +10,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,14 +23,24 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
+import basesDeDados.BDImagens;
 import basesDeDados.BDItens;
 import basesDeDados.BDProduto;
-import basesDeDados.BDImagens;
+import basesDeDados.BDWishs;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -57,12 +67,18 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
     private String text2 = "", text3 = "", text4 = "", text5 = "", promocao = "";
     private Float text6 = null, precoPromocao = null;
     private List<Product> details;
+    private HashMap<String, Object> produtos;
     private String nomeProduto = "";
     private ImageAdapter adapter2;
     private ArrayList<Image> images;
     private REST mREST;
     private BDImagens mDatabase;
     private SharedPreferences preferences;
+    private FirebaseDatabase mFirebaseInstance;
+    private DatabaseReference mFirebaseDatabase;
+    private String itemID;
+    private Product fav;
+    private long[] resultado = new long[1];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +104,7 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
                 text6 = d.getPreco();
                 promocao = d.getPromocao();
                 precoPromocao = d.getPrecoPromocao();
+                this.fav = d;
             }
         }
         cor.setText(text2);
@@ -108,8 +125,6 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
         adapter2 = new ImageAdapter(this, images);
         adapter2.notifyDataSetChanged();
         RecyclerView rvImages = findViewById(R.id.rvImages);
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-        rvImages.addItemDecoration(itemDecoration);
         rvImages.setAdapter(adapter2);
         rvImages.setLayoutManager(new LinearLayoutManager(this));
         getFeed();
@@ -123,12 +138,55 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
 
     }
 
+    private long getR() {
+        return this.resultado[0];
+    }
+
+    private void setR(long r) {
+        this.resultado[0] = r;
+    }
+
+    private void atualizarProduto(Product p) throws Exception {
+        BDProduto dbHelper = new BDProduto(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("favorito", p.getFavourited());
+        long rowId = db.update("tblProduto", values, "referencia= " + p.getReferencia(), null);
+        db.close();
+        if (rowId < 0) {
+            throw new Exception("Não foi possível atualizar o produto");
+        }
+    }
+
+    private void readFromFirebase() {
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseDatabase = mFirebaseInstance.getReference("products").child(String.valueOf(fav.getReferencia()));
+        mFirebaseDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                produtos = (HashMap<String, Object>) dataSnapshot.getValue();
+                for (Map.Entry<String, Object> e : produtos.entrySet()) {
+                    if (e.getKey().equals("Num Favoritos")) {
+                        setR((long) e.getValue());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+        long num = getR() + 1;
+        mFirebaseDatabase.child("Num Favoritos").setValue(num);
+    }
+
     private void getFeedFromDatabase() {
         mDatabase.fetchData(this);
     }
 
-    @OnClick(R.id.button2)
-    public void addicionar(TextView view) {
+    @OnClick(R.id.floating)
+    public void addicionar() {
         final Float precoProduto = text6;
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int counter = preferences.getInt("image_data", 0);
@@ -139,20 +197,81 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
         for (Item i : lista) {
             if (i.getNome().equals(nomeProduto)) {
                 existe = true;
+                break;
             }
         }
         try {
             if (!existeTabela() && !existe) {
-                inserirItem(new Item(counter, precoProduto, 1, nomeProduto));
+                Random rn = new Random();
+                int range = 10000 - 1000 + 1;
+                int randomNum = rn.nextInt(range) + 1000;
+                Item item = new Item(randomNum, precoProduto, 1, nomeProduto);
+                gravarFirebase(item);
+                inserirItem(item);
                 counter++;
                 edit.putInt("image_data", counter);
                 edit.commit();
-                view.setText("Adicionado ao carrinho!");
-                Toast.makeText(getApplicationContext(), "Novo item no carrinho", Toast.LENGTH_SHORT).show();
+                Toast t = Toast.makeText(getApplicationContext(), "Novo item no carrinho", Toast.LENGTH_SHORT);
+                View v = t.getView();
+                v.setBackgroundResource(R.drawable.toast);
+                t.show();
                 invalidateOptionsMenu();
             } else {
-                view.setText("Já existe no carrinho!");
-                Toast.makeText(getApplicationContext(), "Item já foi adicionado", Toast.LENGTH_SHORT).show();
+                Toast t = Toast.makeText(getApplicationContext(), "Item já foi adicionado", Toast.LENGTH_SHORT);
+                View v = t.getView();
+                v.setBackgroundResource(R.drawable.toast);
+                t.show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @OnClick(R.id.floating2)
+    public void adicionarWishlist() {
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int counter = preferences.getInt("wishs", 0);
+        SharedPreferences.Editor edit = preferences.edit();
+        ArrayList<Item> lista = new ArrayList<>();
+        reloadWishList(lista);
+        boolean existe = false;
+        for (Item i : lista) {
+            if (i.getNome().equals(nomeProduto)) {
+                existe = true;
+                break;
+            }
+        }
+        try {
+            if (!existeTabelaWishs() && !existe) {
+                if (Utility.isNetworkAvailable(this)) {
+                    this.readFromFirebase();
+                }
+                this.fav.setFavourited((int) this.getR() + 1);
+                try {
+                    this.atualizarProduto(this.fav);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Random rn = new Random();
+                int range = 10000 - 1000 + 1;
+                int randomNum = rn.nextInt(range) + 1000;
+                Item item = new Item(randomNum, nomeProduto);
+                gravarFirebaseWish(item);
+                inserirWish(item);
+                counter++;
+                edit.putInt("wishs", counter);
+                edit.commit();
+                Toast t = Toast.makeText(getApplicationContext(), "Novo item na wishlist", Toast.LENGTH_SHORT);
+                View v = t.getView();
+                v.setBackgroundResource(R.drawable.toast);
+                t.show();
+                invalidateOptionsMenu();
+            } else {
+                Toast t = Toast.makeText(getApplicationContext(), "Item já adicionado à wishlist", Toast.LENGTH_SHORT);
+                View v = t.getView();
+                v.setBackgroundResource(R.drawable.toast);
+                t.show();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -165,6 +284,17 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         try {
             db.execSQL("SELECT * FROM sqlite_master WHERE name ='tblItem' and type='table'");
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean existeTabelaWishs() {
+        BDWishs dbHelper = new BDWishs(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        try {
+            db.execSQL("SELECT * FROM sqlite_master WHERE name ='tblWish' and type='table'");
         } catch (Exception e) {
             return false;
         }
@@ -192,6 +322,25 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
         db.close();
     }
 
+    public void reloadWishList(ArrayList<Item> list) {
+        BDWishs
+                dbHelper = new BDWishs(this);
+        SQLiteDatabase db =
+                dbHelper.getWritableDatabase();
+        list.clear();
+        Cursor c = db.rawQuery("SELECT	*	FROM	tblWish", null);
+        if (c != null && c.moveToFirst()) {
+            do {
+                Item p = new Item();
+                p.setId(c.getInt(0));
+                p.setNome(c.getString(1));
+                list.add(p);
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
+    }
+
     private void inserirItem(Item p) throws Exception {
         BDItens dbHelper = new BDItens(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -207,6 +356,50 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
         }
     }
 
+    private void inserirWish(Item p) throws Exception {
+        BDWishs dbHelper = new BDWishs(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("id", p.getId());
+        Log.d("item", String.valueOf(p.getId()));
+        values.put("nome", p.getNome());
+        long rowId = db.insert("tblWish", null, values);
+        db.close();
+        if (rowId < 0) {
+            throw new Exception("Não foi possível inserir o item na Base de Dados");
+        }
+    }
+
+    public void gravarFirebase(Item item) {
+        if (Utility.isNetworkAvailable(getApplicationContext())) {
+            mFirebaseInstance = FirebaseDatabase.getInstance();
+            preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String email = preferences.getString("email", "");
+            String ref = "itens-" + email;
+            String refS = ref.replaceAll("@", "-");
+            String refSS = refS.replaceAll("\\.", "-");
+            mFirebaseDatabase = mFirebaseInstance.getReference(refSS);
+            itemID = String.valueOf(item.getId());
+            mFirebaseDatabase.child(itemID).child("Nome").setValue(item.getNome());
+            mFirebaseDatabase.child(itemID).child("Preço").setValue(item.getPreco());
+            mFirebaseDatabase.child(itemID).child("Quantidade").setValue(item.getQuantidade());
+        }
+    }
+
+    public void gravarFirebaseWish(Item item) {
+        if (Utility.isNetworkAvailable(getApplicationContext())) {
+            mFirebaseInstance = FirebaseDatabase.getInstance();
+            preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String email = preferences.getString("email", "");
+            String ref = "wishs-" + email;
+            String refS = ref.replaceAll("@", "-");
+            String refSS = refS.replaceAll("\\.", "-");
+            mFirebaseDatabase = mFirebaseInstance.getReference(refSS);
+            itemID = String.valueOf(item.getId());
+            mFirebaseDatabase.child(itemID).child("Nome").setValue(item.getNome());
+        }
+    }
+
     private Drawable buildCounterDrawable(int count, int backgroundImageId) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.contadorcarrinho, null);
@@ -216,7 +409,7 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
             View counterTextPanel = view.findViewById(R.id.count);
             counterTextPanel.setVisibility(View.GONE);
         } else {
-            TextView textView = (TextView) view.findViewById(R.id.count);
+            TextView textView = view.findViewById(R.id.count);
             textView.setText("" + count);
         }
 
@@ -252,6 +445,7 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
             }
             return null;
         }
+
     }
 
     private void loadData() {
@@ -307,6 +501,7 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
                 p.setDisponivel(c.getString(8));
                 p.setPromocao(c.getString(9));
                 p.setPrecoPromocao(c.getFloat(10));
+                p.setFavourited(c.getInt(11));
                 list.add(p);
             } while (c.moveToNext());
         }
@@ -324,10 +519,18 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem menuItem = menu.findItem(R.id.badge);
+        MenuItem menuItem2 = menu.findItem(R.id.wish);
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int counter = preferences.getInt("image_data", 0);
         menuItem.setIcon(buildCounterDrawable(counter, R.drawable.ic_action_cart));
+        int counterWishs = preferences.getInt("wishs", 0);
+        menuItem2.setIcon(buildCounterDrawable(counterWishs, R.drawable.fav));
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -338,6 +541,9 @@ public class DetalhesProduto extends AppCompatActivity implements ImageListener 
                 return true;
             case R.id.badge:
                 startActivity(new Intent(getApplicationContext(), encomendas.CarrinhoCompras.class));
+                return true;
+            case R.id.wish:
+                startActivity(new Intent(getApplicationContext(), encomendas.Wishlist.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

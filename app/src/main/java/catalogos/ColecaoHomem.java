@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -41,14 +40,17 @@ public class ColecaoHomem extends AppCompatActivity {
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         RecyclerView rvProducts = findViewById(R.id.rvProducts);
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-        rvProducts.addItemDecoration(itemDecoration);
         products = new ArrayList<>();
         reloadProductList(products);
         adapter = new ProductsAdapter(this, products);
         adapter.notifyDataSetChanged();
         rvProducts.setAdapter(adapter);
         rvProducts.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    public void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
     }
 
     public void reloadProductList(ArrayList<Product> list) {
@@ -72,6 +74,7 @@ public class ColecaoHomem extends AppCompatActivity {
                 p.setDisponivel(c.getString(8));
                 p.setPromocao(c.getString(9));
                 p.setPrecoPromocao(c.getFloat(10));
+                p.setFavourited(c.getInt(11));
                 list.add(p);
             } while (c.moveToNext());
         }
@@ -94,7 +97,7 @@ public class ColecaoHomem extends AppCompatActivity {
             View counterTextPanel = view.findViewById(R.id.count);
             counterTextPanel.setVisibility(View.GONE);
         } else {
-            TextView textView = (TextView) view.findViewById(R.id.count);
+            TextView textView = view.findViewById(R.id.count);
             textView.setText("" + count);
         }
 
@@ -110,13 +113,17 @@ public class ColecaoHomem extends AppCompatActivity {
 
         return new BitmapDrawable(getResources(), bitmap);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem menuItem = menu.findItem(R.id.badge);
+        MenuItem menuItem2 = menu.findItem(R.id.wish);
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int counter = preferences.getInt("image_data", 0);
         menuItem.setIcon(buildCounterDrawable(counter, R.drawable.ic_action_cart));
+        int counterWishs = preferences.getInt("wishs", 0);
+        menuItem2.setIcon(buildCounterDrawable(counterWishs, R.drawable.fav));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -128,6 +135,9 @@ public class ColecaoHomem extends AppCompatActivity {
                 return true;
             case R.id.badge:
                 startActivity(new Intent(getApplicationContext(), encomendas.CarrinhoCompras.class));
+                return true;
+            case R.id.wish:
+                startActivity(new Intent(getApplicationContext(), encomendas.Wishlist.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

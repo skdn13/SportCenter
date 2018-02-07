@@ -38,6 +38,12 @@
         <activity android:name="encomendas.Checkout" />
         <activity android:name="encomendas.Historico" />
         <activity android:name="catalogos.Promocoes" />
+        <activity android:name="encomendas.Wishlist" />
+        <activity android:name=".Top" />
+        <activity android:name=".TopDash" />
+        <activity android:name=".TopHomem" />
+        <activity android:name=".TopMulher" />
+        <activity android:name=".TopCrianca" />
         <activity
             android:name="login.LoginActivity"
             android:label="@string/title_activity_login">

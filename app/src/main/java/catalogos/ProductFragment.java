@@ -5,7 +5,6 @@ import android.app.Fragment;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -29,6 +28,10 @@ public class ProductFragment extends Fragment {
         reloadProductList(products);
     }
 
+    public void onResume() {
+        super.onResume();
+        getActivity().invalidateOptionsMenu();
+    }
 
     public void reloadProductList(ArrayList<Product> list) {
         BDProduto
@@ -51,6 +54,7 @@ public class ProductFragment extends Fragment {
                 p.setDisponivel(c.getString(8));
                 p.setPromocao(c.getString(9));
                 p.setPrecoPromocao(c.getFloat(10));
+                p.setFavourited(c.getInt(11));
                 list.add(p);
             } while (c.moveToNext());
         }
@@ -65,8 +69,6 @@ public class ProductFragment extends Fragment {
         adapter = new ProductsAdapter(getActivity(), products);
         adapter.notifyDataSetChanged();
         RecyclerView rvProducts = mContentView.findViewById(R.id.rvProducts1);
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
-        rvProducts.addItemDecoration(itemDecoration);
         rvProducts.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvProducts.setAdapter(adapter);
         return mContentView;
