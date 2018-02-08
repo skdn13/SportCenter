@@ -1,5 +1,7 @@
 package pt.ipp.estg.sportcenter;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +12,8 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 
+import java.util.List;
+
 public class Preferences extends PreferenceActivity {
     private SharedPreferences preferences;
 
@@ -17,7 +21,8 @@ public class Preferences extends PreferenceActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.app_preferences);
-        Preference myPref = (Preference) findPreference("pref_logout");
+        Preference myPref = findPreference("pref_logout");
+        final Preference music = findPreference("pref_music");
         myPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -25,6 +30,31 @@ public class Preferences extends PreferenceActivity {
                 return true;
             }
         });
+        music.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (isServiceRunning(getApplicationContext(), BackgroundSoundService.class)) {
+                    stopService(new Intent(getApplicationContext(), BackgroundSoundService.class));
+                    music.setSummary("Ligar música");
+                } else {
+                    startService(new Intent(getApplicationContext(), BackgroundSoundService.class));
+                    music.setSummary("Desligar música");
+                }
+                return true;
+            }
+        });
+    }
+
+    public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
+        final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
+
+        for (ActivityManager.RunningServiceInfo runningServiceInfo : services) {
+            if (runningServiceInfo.service.getClassName().equals(serviceClass.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void showAlertDialog() {

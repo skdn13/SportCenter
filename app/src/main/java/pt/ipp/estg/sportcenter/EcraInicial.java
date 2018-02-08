@@ -58,6 +58,8 @@ public class EcraInicial extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard);
         ButterKnife.bind(this);
+        Intent svc = new Intent(this, BackgroundSoundService.class);
+        startService(svc);
         android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("SportCenter");
         setSupportActionBar(myToolbar);

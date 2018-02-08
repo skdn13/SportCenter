@@ -5,5 +5,9 @@
             android:key="pref_logout"
             android:summary="@string/not_weather"
             android:title="Logout" />
+        <Preference
+            android:key="pref_music"
+            android:summary="Desligar música"
+            android:title="Música" />
     </PreferenceCategory>
 </PreferenceScreen>
